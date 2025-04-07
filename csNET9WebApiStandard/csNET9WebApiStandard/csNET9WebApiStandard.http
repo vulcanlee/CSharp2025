@@ -1,0 +1,10 @@
+@csNET9WebApiStandard_HostAddress = https://localhost:7004
+
+GET {{csNET9WebApiStandard_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{csNET9WebApiStandard_HostAddress}}/weatherforecast
+
+###

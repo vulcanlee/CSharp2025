@@ -4,6 +4,7 @@
 |-|-|-|
 |*csNET9WebApiStandard|ASP.NET Core 9 Web API 專案範本||
 |csAzureBlogStorage|如何使用與存取 Azure Blob Storage Service||
+|csSpeechToTextBatch|將語音檔案進行批次轉錄成為文字||
 ||||
 ||||
 ||||

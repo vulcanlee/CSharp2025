@@ -3,6 +3,7 @@
 |專案名稱|專案說明|備註|
 |-|-|-|
 |*csNET9WebApiStandard|ASP.NET Core 9 Web API 專案範本||
+|csAzureBlogStorage|如何使用與存取 Azure Blob Storage Service||
 ||||
 ||||
 ||||

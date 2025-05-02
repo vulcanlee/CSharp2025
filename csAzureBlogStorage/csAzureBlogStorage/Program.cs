@@ -2,7 +2,7 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 
-namespace csAzureBlogStorage
+namespace csAzureBlobStorage
 {
     internal class Program
     {

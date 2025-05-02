@@ -3,9 +3,9 @@
 |專案名稱|專案說明|備註|
 |-|-|-|
 |*csNET9WebApiStandard|ASP.NET Core 9 Web API 專案範本||
-|csAzureBlogStorage|如何使用與存取 Azure Blob Storage Service||
+|csAzureBlobStorage|如何使用與存取 Azure Blob Storage Service||
 |csSpeechToTextBatch|將語音檔案進行批次轉錄成為文字||
-||||
+|csSTTAllInOne|設機一個支援類別，整理上傳 .mp3 與 轉文字的功能||
 ||||
 ||||
 ||||

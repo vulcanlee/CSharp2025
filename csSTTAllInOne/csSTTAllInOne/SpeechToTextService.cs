@@ -37,6 +37,7 @@ public class SpeechToTextService
         string sasToken = await UploadToAzureBlobStorage(filename);
         // 2. 轉錄音檔
         result = await ParseSpeechToText(sasToken);
+        await Save(filename, result);
         return result;
     }
 
@@ -117,7 +118,7 @@ public class SpeechToTextService
             properties = new
             {
                 diarizationEnabled = false,
-                wordLevelTimestampsEnabled = true,
+                wordLevelTimestampsEnabled = false,
                 punctuationMode = "DictatedAndAutomatic"
             }
         };
@@ -226,5 +227,23 @@ public class SpeechToTextService
         }
 
         return result;
+    }
+
+    async Task Save(string filename, string content)
+    {
+        // 儲存轉錄結果到檔案
+        string filenameRaw = filename.Replace(".mp3", " RAW.m3");
+        string filenameGpt = filename.Replace(".mp3", " GPT.m3");
+        string outputPath = Path.Combine(Directory.GetCurrentDirectory(), filenameRaw);
+        using (StreamWriter writer = new StreamWriter(outputPath))
+        {
+            await writer.WriteAsync(content);
+        }
+
+        outputPath = Path.Combine(Directory.GetCurrentDirectory(), filenameGpt);
+        using (StreamWriter writer = new StreamWriter(outputPath))
+        {
+            await writer.WriteAsync("");
+        }
     }
 }

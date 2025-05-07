@@ -232,8 +232,8 @@ public class SpeechToTextService
     async Task Save(string filename, string content)
     {
         // 儲存轉錄結果到檔案
-        string filenameRaw = filename.Replace(".mp3", " RAW.m3");
-        string filenameGpt = filename.Replace(".mp3", " GPT.m3");
+        string filenameRaw = filename.Replace(".mp3", " RAW.md");
+        string filenameGpt = filename.Replace(".mp3", " GPT.md");
         string outputPath = Path.Combine(Directory.GetCurrentDirectory(), filenameRaw);
         using (StreamWriter writer = new StreamWriter(outputPath))
         {

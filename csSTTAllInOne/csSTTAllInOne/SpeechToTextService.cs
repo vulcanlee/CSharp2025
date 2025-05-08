@@ -4,8 +4,6 @@ using Azure.Storage.Sas;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
-using Microsoft.CognitiveServices.Speech;
-using Microsoft.CognitiveServices.Speech.Audio;
 
 namespace csSTTAllInOne;
 
@@ -23,104 +21,6 @@ class CombinedPhrase
     [JsonProperty("display")]
     public string Display { get; set; }
 }
-/// <summary>
-/// 建立批次語音轉錄請求的主體
-/// </summary>
-public class TranscriptionRequest
-{
-    /// <summary>
-    /// 音檔的 SAS URL 陣列
-    /// </summary>
-    [JsonProperty("contentUrls")]
-    public string[] ContentUrls { get; set; }
-
-    /// <summary>
-    /// 語音辨識語言（如 zh-TW, en-US）
-    /// </summary>
-    [JsonProperty("locale")]
-    public string Locale { get; set; }
-
-    /// <summary>
-    /// 此次轉錄任務的顯示名稱
-    /// </summary>
-    [JsonProperty("displayName")]
-    public string DisplayName { get; set; }
-
-    /// <summary>
-    /// 轉錄任務的屬性設定
-    /// </summary>
-    [JsonProperty("properties")]
-    public TranscriptionProperties Properties { get; set; }
-}
-
-/// <summary>
-/// 批次語音轉錄的屬性設定
-/// </summary>
-public class TranscriptionProperties
-{
-    /// <summary>
-    /// 是否啟用說話者分離（語者分離/分軌），預設 false
-    /// </summary>
-    [JsonProperty("diarizationEnabled")]
-    public bool DiarizationEnabled { get; set; } = true;
-
-    /// <summary>
-    /// 是否輸出逐字時間戳記，預設 false
-    /// </summary>
-    [JsonProperty("wordLevelTimestampsEnabled")]
-    public bool WordLevelTimestampsEnabled { get; set; }=false;
-
-    /// <summary>
-    /// 標點符號模式（"DictatedAndAutomatic"、"DictatedOnly"、"Automatic"、"None"）
-    /// </summary>
-    [JsonProperty("punctuationMode")]
-    public string PunctuationMode { get; set; }
-
-    /// <summary>
-    /// 是否啟用自動語言偵測（多語言音檔），預設 false
-    /// </summary>
-    [JsonProperty("autoDetectEnabled")]
-    public bool? AutoDetectEnabled { get; set; } = true;
-
-    /// <summary>
-    /// 是否啟用語音辨識信心分數輸出，預設 false
-    /// </summary>
-    [JsonProperty("profanityFilterMode")]
-    public string ProfanityFilterMode { get; set; } // "Masked", "Removed", "Raw"
-
-    /// <summary>
-    /// 是否啟用語音辨識信心分數輸出，預設 false
-    /// </summary>
-    [JsonProperty("displayFormWordLevelTimestampsEnabled")]
-    public bool? DisplayFormWordLevelTimestampsEnabled { get; set; }
-
-    /// <summary>
-    /// 是否啟用語音辨識信心分數輸出，預設 false
-    /// </summary>
-    [JsonProperty("sentimentAnalysis")]
-    public bool? SentimentAnalysis { get; set; }=false;
-
-    /// <summary>
-    /// 是否啟用語音辨識信心分數輸出，預設 false
-    /// </summary>
-    [JsonProperty("profanityFilter")]
-    public bool? ProfanityFilter { get; set; }=false;
-
-    /// <summary>
-    /// 是否啟用語音辨識信心分數輸出，預設 false
-    /// </summary>
-    [JsonProperty("wordLevelConfidence")]
-    public bool? WordLevelConfidence { get; set; }=false;
-
-    /// <summary>
-    /// 是否啟用語音辨識信心分數輸出，預設 false
-    /// </summary>
-    [JsonProperty("channels")]
-    public int? Channels { get; set; }
-
-    // 其他進階屬性可參考官方文件
-}
-
 public class SpeechToTextService
 {
     private readonly ILogger<SpeechToTextService> logger;
@@ -210,18 +110,19 @@ public class SpeechToTextService
 
         // 1. 建立轉錄工作
         var createUrl = $"https://{ServiceRegion}.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions";
-        var createBody = new TranscriptionRequest
+        var createBody = new
         {
-            ContentUrls = new[] { AudioFileSasUri },
-            Locale = "zh-TW",
-            DisplayName = "My Batch Transcription",
-            Properties = new TranscriptionProperties
+            contentUrls = new[] { AudioFileSasUri },
+            locale = "zh-TW",
+            displayName = "My Batch Transcription",
+            properties = new
             {
-                DiarizationEnabled = true,
-                WordLevelTimestampsEnabled = false,
-                PunctuationMode = "DictatedAndAutomatic"
+                diarizationEnabled = false,
+                wordLevelTimestampsEnabled = false,
+                punctuationMode = "DictatedAndAutomatic"
             }
         };
+
         var jsonContent = new StringContent(JsonConvert.SerializeObject(createBody));
         jsonContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var createResponse = await client.PostAsync(createUrl, jsonContent);
@@ -234,7 +135,6 @@ public class SpeechToTextService
         // 解析 self URL
         dynamic createJson = JsonConvert.DeserializeObject(createResult);
         string transcriptionUrl = createJson.self;
-        logger.LogInformation($"查詢狀態 URL :{transcriptionUrl}");
 
         // 2. 輪詢狀態
         logger.LogInformation("開始輪詢轉錄狀態…");
@@ -270,8 +170,8 @@ public class SpeechToTextService
                     {
                         var fileUrl = (string)file.links.contentUrl;
                         var transcriptionResult = await client.GetStringAsync(fileUrl);
-                        logger.LogInformation("---- 轉錄結果 ----");
-                        logger.LogInformation(transcriptionResult);
+                        //Console.WriteLine("---- 轉錄結果 ----");
+                        //Console.WriteLine(transcriptionResult);
 
                         // 取得最終錄音文字
                         // 反序列化
@@ -311,7 +211,7 @@ public class SpeechToTextService
                                      .Where(s => !string.IsNullOrEmpty(s))
                         );
                         logger.LogInformation("---- 完整轉錄文字 ----");
-                        //logger.LogInformation(fullText);
+                        logger.LogInformation(fullText);
                         result = fullText;
                     }
                 }
@@ -323,7 +223,7 @@ public class SpeechToTextService
                 break;
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(60));
+            await Task.Delay(TimeSpan.FromSeconds(5));
         }
 
         return result;
@@ -343,7 +243,7 @@ public class SpeechToTextService
         outputPath = Path.Combine(Directory.GetCurrentDirectory(), filenameGpt);
         using (StreamWriter writer = new StreamWriter(outputPath))
         {
-            await writer.WriteAsync("將這份錄音文稿，整理出一份會議紀錄，說明此次會議的主題、討論的重點、代辦事項、決議或者確認事項、潛在問題或疑問、其他補充事項");
+            await writer.WriteAsync("將這份錄音文稿，整理出一份會議紀錄，說明此次會議的主題、問題處理狀況、討論的重點、代辦事項、決議或者確認事項、潛在問題或疑問、其他補充事項\r\n");
         }
     }
 }

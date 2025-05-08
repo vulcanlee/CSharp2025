@@ -135,6 +135,7 @@ public class SpeechToTextService
         // 解析 self URL
         dynamic createJson = JsonConvert.DeserializeObject(createResult);
         string transcriptionUrl = createJson.self;
+        logger.LogInformation($"查詢狀態 URL :{transcriptionUrl}");
 
         // 2. 輪詢狀態
         logger.LogInformation("開始輪詢轉錄狀態…");
@@ -170,8 +171,8 @@ public class SpeechToTextService
                     {
                         var fileUrl = (string)file.links.contentUrl;
                         var transcriptionResult = await client.GetStringAsync(fileUrl);
-                        //Console.WriteLine("---- 轉錄結果 ----");
-                        //Console.WriteLine(transcriptionResult);
+                        logger.LogInformation("---- 轉錄結果 ----");
+                        logger.LogInformation(transcriptionResult);
 
                         // 取得最終錄音文字
                         // 反序列化
@@ -211,7 +212,7 @@ public class SpeechToTextService
                                      .Where(s => !string.IsNullOrEmpty(s))
                         );
                         logger.LogInformation("---- 完整轉錄文字 ----");
-                        logger.LogInformation(fullText);
+                        //logger.LogInformation(fullText);
                         result = fullText;
                     }
                 }
@@ -223,7 +224,7 @@ public class SpeechToTextService
                 break;
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            await Task.Delay(TimeSpan.FromSeconds(60));
         }
 
         return result;

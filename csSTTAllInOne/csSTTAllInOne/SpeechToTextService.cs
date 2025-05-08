@@ -117,10 +117,41 @@ public class SpeechToTextService
             displayName = "My Batch Transcription",
             properties = new
             {
-                diarizationEnabled = false,
+                diarizationEnabled = false, 
                 wordLevelTimestampsEnabled = false,
-                punctuationMode = "DictatedAndAutomatic"
+                punctuationMode = "DictatedAndAutomatic", 
+                //maxSpeakerCount = 10, // 最大说话人数量
             }
+
+
+            //contentUrls = new[] { AudioFileSasUri },
+            //locale = "zh-TW",
+            //displayName = "详细会议记录",
+            //description = "含说话人分离的会议内容转录",
+            //properties = new
+            //{
+            //    // 基本处理选项
+            //    diarizationEnabled = true, // 启用说话人分离
+            //    wordLevelTimestampsEnabled = false, // 启用单词级时间戳
+            //    punctuationMode = "DictatedAndAutomatic", // 启用标点符号
+            //    //profanityFilterMode = "Masked",  
+
+            //    // 高级选项
+            //    addSentiment = true, // 启用情感分析
+            //    maxSpeakerCount = 10, // 最大说话人数量
+            //    phraseOutputFormat = "Detailed", // 输出格式为详细模式
+
+            //    // 多语言识别
+            //    //languageIdentification = new
+            //    //{
+            //    //    candidateLocales = new[] { "zh-TW", "zh-CN", "en-US" },
+            //    //    mode = "Continuous"
+            //    //},
+
+            //    // 结果存储
+            //    timeToLive = "P1D",  // 保留结果1天
+            //    //destinationContainerUrl = "容器SAS URI"
+            //}
         };
 
         var jsonContent = new StringContent(JsonConvert.SerializeObject(createBody));
@@ -211,7 +242,7 @@ public class SpeechToTextService
                                      .Where(s => !string.IsNullOrEmpty(s))
                         );
                         logger.LogInformation("---- 完整轉錄文字 ----");
-                        logger.LogInformation(fullText);
+                        //logger.LogInformation(fullText);
                         result = fullText;
                     }
                 }
@@ -219,11 +250,11 @@ public class SpeechToTextService
             }
             else if (status == "Failed")
             {
-                logger.LogError("轉錄失敗");
+                logger.LogError($"轉錄失敗 : {statusJson}");
                 break;
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            await Task.Delay(TimeSpan.FromSeconds(60));
         }
 
         return result;

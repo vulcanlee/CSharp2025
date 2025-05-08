@@ -35,7 +35,7 @@ namespace csSTTAllInOne
             // 使用其他服務
             var speechToTextService = serviceProvider.GetRequiredService<SpeechToTextService>();
 
-            string fileItem = "250501_0814.mp3";
+            string fileItem = "250507_1540.mp3";
             string filename = Path.Combine(Directory.GetCurrentDirectory(), fileItem);
             string textScript = await speechToTextService.ProcessAsync(filename);
             logger.LogInformation("語音文稿解析完成 ： {0}", textScript);

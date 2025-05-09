@@ -24,12 +24,34 @@ class CombinedPhrase
 public class SpeechToTextService
 {
     private readonly ILogger<SpeechToTextService> logger;
-
+    List<string> audioFiles = new List<string>();
     public SpeechToTextService(ILogger<SpeechToTextService> logger)
     {
         this.logger = logger;
     }
 
+    public async Task BuildAsync()
+    {
+        string currentDirectory = Directory.GetCurrentDirectory();
+        audioFiles = Directory.GetFiles(currentDirectory, "*.mp3").ToList();
+        if (audioFiles.Count == 0)
+        {
+            logger.LogError("沒有找到音檔，請確認當前目錄是否有 mp3 檔案");
+            return;
+        }
+        else
+        {
+            foreach (var file in audioFiles)
+            {
+                logger.LogInformation("找到音檔：{0}", file);
+                string fileItem = Path.GetFileName(file);
+                string filename = Path.Combine(currentDirectory, fileItem);
+                string textScript = await ProcessAsync(filename);
+                logger.LogInformation("語音文稿解析完成 ： {0}", fileItem);
+            }
+        }
+
+    }
     public async Task<string> ProcessAsync(string filename)
     {
         string result = string.Empty;

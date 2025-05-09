@@ -30,15 +30,14 @@ namespace csSTTAllInOne
 
             // 取得 ILogger 實例
             var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+
+            logger.LogInformation("AI 會議記錄 Ver 1.0.20250509 By Vulcan Lee");
             logger.LogInformation("應用程式啟動中...");
 
             // 使用其他服務
             var speechToTextService = serviceProvider.GetRequiredService<SpeechToTextService>();
 
-            string fileItem = "250507_1540.mp3";
-            string filename = Path.Combine(Directory.GetCurrentDirectory(), fileItem);
-            string textScript = await speechToTextService.ProcessAsync(filename);
-            logger.LogInformation("語音文稿解析完成 ： {0}", textScript);
+            await speechToTextService.BuildAsync();
         }
     }
 }

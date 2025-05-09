@@ -137,12 +137,24 @@ public class SpeechToTextService
             contentUrls = new[] { AudioFileSasUri },
             locale = "zh-TW",
             displayName = "My Batch Transcription",
+            description = "含说话人分离的会议内容转录",
             properties = new
             {
-                diarizationEnabled = false, 
+                diarizationEnabled = false,
                 wordLevelTimestampsEnabled = false,
-                punctuationMode = "DictatedAndAutomatic", 
+                punctuationMode = "DictatedAndAutomatic",
                 //maxSpeakerCount = 10, // 最大说话人数量
+                addSentiment = true, // 启用情感分析
+                profanityFilterMode = "Masked", // 启用脏话过滤
+                // 多语言识别
+                languageIdentification = new
+                {
+                    candidateLocales = new[] { "zh-TW", "zh-CN", "en-US" },
+                    mode = "Continuous"
+                },
+
+                // 结果存储
+                timeToLive = "P1D",  // 保留结果1天
             }
 
 
@@ -188,6 +200,7 @@ public class SpeechToTextService
         // 解析 self URL
         dynamic createJson = JsonConvert.DeserializeObject(createResult);
         string transcriptionUrl = createJson.self;
+        logger.LogInformation($"查詢轉錄狀態 URL {transcriptionUrl}");
 
         // 2. 輪詢狀態
         logger.LogInformation("開始輪詢轉錄狀態…");
@@ -263,9 +276,10 @@ public class SpeechToTextService
                                      .Select(p => $"channel {p.Channel}:\n{p.Display?.Trim()}\n\n")
                                      .Where(s => !string.IsNullOrEmpty(s))
                         );
-                        logger.LogInformation("---- 完整轉錄文字 ----");
+                        //logger.LogInformation("---- 完整轉錄文字 ----");
                         //logger.LogInformation(fullText);
                         result = fullText;
+                        logger.LogInformation("---- 轉錄完成 ----");
                     }
                 }
                 break;

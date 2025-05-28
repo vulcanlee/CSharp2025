@@ -20,7 +20,7 @@ namespace csDicomToImage
 
             string dicomFile = "image-00000.dcm";
             string pngFile = "out.png";
-            string rootPath = @"C:\Vulcan\temp\series-00000";
+            string rootPath = Directory.GetCurrentDirectory();
             string dicomFilePath = Path.Combine(rootPath, dicomFile);
             string pngFilePath = Path.Combine(rootPath, pngFile);
 

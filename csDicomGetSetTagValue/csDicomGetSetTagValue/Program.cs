@@ -31,7 +31,7 @@ namespace csDicomGetSetTagValue
                 DicomTag patientIdTagAgain = QueryTag(dicomFile);
 
                 // 儲存修改後的 DICOM 檔案
-                dicomFile.Save(outputDicomPath);
+                dicomFile.Save(dicomPath);
 
             }
             catch (Exception ex)

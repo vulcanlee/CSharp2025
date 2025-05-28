@@ -8,7 +8,7 @@
 |csSTTAllInOne|設機一個支援類別，整理上傳 .mp3 與 轉文字的功能||
 |csDicomToImage|將 DICOM 轉換成為一個 Image||
 |csDicomListAllTag|列出 DICOM 檔案中的所有標籤||
-||||
+|csDicomGetSetTagValue|取得或設定 DICOM 檔案中的標籤值||
 ||||
 ||||
 ||||

@@ -1,0 +1,36 @@
+﻿<div style="width: 200px; ">
+    <!-- 異常統計指示器 -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+        <div style="width: 200px; border-radius: 10px; border: 1px solid #d0e8ff; background-color: @Data.NormalColor; padding: 10px; font-family: Arial, sans-serif; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <!-- 異常統計指示器 -->
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                <div style="background-color: #ffb3b3; padding: 3px 10px; border-radius: 15px; color: #333; font-size: 14px; font-weight: bold;">
+                    @Data.AbnormalNodes 異常
+                </div>
+            </div>
+
+            <!-- 伺服器列表 -->
+            <div style="display: flex; flex-direction: column;">
+                @foreach (var node in Data.GetDisplayList())
+                {
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #e0e0e0; background-color: white; border-radius: 4px; margin-bottom: 2px;">
+                        @if (node.Title == "_")
+                        {
+                            <span style="font-weight: bold;">@node.Title</span>
+                        }
+                        else
+                        {
+                            <span style="font-weight: bold;">@node.Title</span>
+                            <span style="width: 12px; height: 12px; border-radius: 50%; background-color: @node.StatusColor;"></span>
+                        }
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public MonitorTypeModel Data { get; set; } = new();
+}

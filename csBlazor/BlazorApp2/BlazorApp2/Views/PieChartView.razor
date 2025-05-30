@@ -1,0 +1,127 @@
+﻿<div>
+    <div style="width:150px; height:200px; ">
+        <div style="font-size:24px; font-weight:bold; margin-bottom:5px;">健康度：@Data.NormalHostsPercent<span>%</span> </div>
+        <div style="width:150px; height:150px; position:relative;">
+            <svg width="150" height="150" viewBox="0 0 150 150">
+                <!-- 圓餅圖的兩個扇形部分 -->
+                <circle cx="75" cy="75" r="75" fill="transparent"></circle>
+
+                @*             <!-- 綠色部分 (65%) -->
+            <path d="M 75 75 L 75 0 A 75 75 0 0 1 142 107 L 75 75" fill="#c1e6c1"></path>
+
+            <!-- 粉紅色部分 (35%) -->
+            <path d="M 75 75 L 142 107 A 75 75 0 0 1 75 150 A 75 75 0 0 1 8 107 A 75 75 0 0 1 75 0 L 75 75" fill="#ffd0d0"></path>
+ *@            
+
+            <!-- 綠色部分 (65%) -->
+                <path d="@NormalPathD" fill="@Data.NormalHostsColor"></path>
+
+                <!-- 粉紅色部分 (35%) -->
+                <path d="@AbormalPathD" fill="@Data.AbormalHostColor"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div>
+        <div style="display: flex; justify-content: start; align-items: center; padding: 2px; background-color: white; margin-bottom: 2px;">
+            <span style="width: 12px; height: 12px; border-radius: 50%; background-color: @Data.NormalHostsColor;"></span>
+            <span style="font-weight: bold;margin-left: 4px;">@Data.NormalHostsSummary</span>
+        </div>
+
+        <div style="display: flex; justify-content: start; align-items: center; padding: 2px; background-color: white; margin-bottom: 2px;">
+            <span style="width: 12px; height: 12px; border-radius: 50%; background-color: @Data.AbormalHostColor;"></span>
+            <span style="font-weight: bold;margin-left: 4px;">@Data.AbormalHostSummary</span>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PercentDataModel Data { get; set; }
+
+    string NormalPathD ;
+    string AbormalPathD ;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Refresh();
+        await Task.Yield();
+    }
+
+    public void Refresh()
+    {
+        // 重新計算路徑
+        NormalPathD = GetNormalPathD();
+        AbormalPathD = GetAbormalPathD();
+    }
+
+    private string GetNormalPathD()
+    {
+        // 圓心座標
+        double cx = 75;
+        double cy = 75;
+        // 半徑
+        double r = 75;
+
+        // 計算對應角度 (轉換百分比為角度)
+        double angle = (double)Data.NormalHostsPercent / 100 * 360;
+
+        // 計算終點座標
+        double endX = cx + r * Math.Sin(angle * Math.PI / 180);
+        double endY = cy - r * Math.Cos(angle * Math.PI / 180);
+
+        // 確定是否為大弧 (角度大於180度)
+        int largeArcFlag = angle > 180 ? 1 : 0;
+
+        // 生成路徑描述
+        if ((double)Data.NormalHostsPercent >= 100)
+        {
+            // 如果正常百分比為100%，繪製完整圓
+            return $"M {cx} {cy} L {cx} {cy - r} A {r} {r} 0 1 1 {cx - 0.001} {cy - r} Z";
+        }
+        else if ((double)Data.NormalHostsPercent <= 0)
+        {
+            // 如果正常百分比為0%，不繪製
+            return "";
+        }
+        else
+        {
+            // 繪製部分圓弧
+            return $"M {cx} {cy} L {cx} {cy - r} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {cx} {cy}";
+        }
+    }
+
+    private string GetAbormalPathD()
+    {
+        // 圓心座標
+        double cx = 75;
+        double cy = 75;
+        // 半徑
+        double r = 75;
+
+        // 計算正常部分的終止角度
+        double normalAngle = (double)Data.NormalHostsPercent / 100 * 360;
+
+        // 計算正常部分的終點座標
+        double startX = cx + r * Math.Sin(normalAngle * Math.PI / 180);
+        double startY = cy - r * Math.Cos(normalAngle * Math.PI / 180);
+
+        if ((double)Data.AbormalHostsPercent >= 100)
+        {
+            // 如果異常百分比為100%，繪製完整圓
+            return $"M {cx} {cy} L {cx} {cy - r} A {r} {r} 0 1 1 {cx - 0.001} {cy - r} Z";
+        }
+        else if ((double)Data.AbormalHostsPercent <= 0)
+        {
+            // 如果異常百分比為0%，不繪製
+            return "";
+        }
+        else
+        {
+            // 繪製從正常部分結束位置開始的弧
+            // 注意：我們必須從正常部分的終點開始繪製
+            return $"M {cx} {cy} L {startX} {startY} A {r} {r} 0 {(Data.AbormalHostsPercent > 50 ? 1 : 0)} 1 {cx} {cy - r} L {cx} {cy}";
+        }
+    }
+}

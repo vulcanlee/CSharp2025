@@ -1,0 +1,47 @@
+﻿<div>
+    <div style="width:150px; height:200px; ">
+        <div style="font-size:24px; font-weight:bold; margin-bottom:5px;">健康度：@Data.NormalHostsPercent<span>%</span> </div>
+        <div style="width:150px; height:150px; position:relative;">
+            <svg width="150" height="150" viewBox="0 0 150 150">
+                <!-- 圓餅圖的兩個扇形部分 -->
+                <circle cx="75" cy="75" r="75" fill="transparent"></circle>
+
+                @*             <!-- 綠色部分 (65%) -->
+            <path d="M 75 75 L 75 0 A 75 75 0 0 1 142 107 L 75 75" fill="#c1e6c1"></path>
+
+            <!-- 粉紅色部分 (35%) -->
+            <path d="M 75 75 L 142 107 A 75 75 0 0 1 75 150 A 75 75 0 0 1 8 107 A 75 75 0 0 1 75 0 L 75 75" fill="#ffd0d0"></path>
+ *@            
+
+            <!-- 綠色部分 (65%) -->
+                <path d="@Data.NormalPathD" fill="@Data.NormalHostsColor"></path>
+
+                <!-- 粉紅色部分 (35%) -->
+                <path d="@Data.AbormalPathD" fill="@Data.AbormalHostColor"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div>
+        <div style="display: flex; justify-content: start; align-items: center; padding: 2px; background-color: white; margin-bottom: 2px;">
+            <span style="width: 12px; height: 12px; border-radius: 50%; background-color: @Data.NormalHostsColor;"></span>
+            <span style="font-weight: bold;margin-left: 4px;">@Data.NormalHostsSummary</span>
+        </div>
+
+        <div style="display: flex; justify-content: start; align-items: center; padding: 2px; background-color: white; margin-bottom: 2px;">
+            <span style="width: 12px; height: 12px; border-radius: 50%; background-color: @Data.AbormalHostColor;"></span>
+            <span style="font-weight: bold;margin-left: 4px;">@Data.AbormalHostSummary</span>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PercentDataModel Data { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Yield();
+    }
+}

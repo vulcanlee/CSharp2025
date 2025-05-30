@@ -1,0 +1,77 @@
+﻿<div>
+    <HeaderView OnClickCallback=OnRefresh />
+
+    <div class="d-flex align-items-center gap-3">
+        <div>
+            <PieChartView Data=percentData />
+            <SumCountView Data=summary監控機台 />
+            <SumCountView Data=summary異常機台 />
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div>
+                <DonutView Data=serviceType />
+                <DetailListView Data=serviceType />
+            </div>
+            <div>
+                <DonutView Data=memoryType />
+                <DetailListView Data=memoryType />
+            </div>
+            <div>
+                <DonutView Data=cpuType />
+                <DetailListView Data=cpuType />
+            </div>
+            <div>
+                <DonutView Data=diskType />
+                <DetailListView Data=diskType />
+            </div>
+            <div>
+                <DonutView Data=databaseType />
+                <DetailListView Data=databaseType />
+            </div>
+            <div>
+                <DonutView Data=databaseSpaceType />
+                <DetailListView Data=databaseSpaceType />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    SummaryDataModel summary監控機台 = new();
+    SummaryDataModel summary異常機台 = new();
+    PercentDataModel percentData = new();
+    MonitorTypeModel serviceType = new();
+    MonitorTypeModel memoryType = new();
+    MonitorTypeModel cpuType = new();
+    MonitorTypeModel diskType = new();
+    MonitorTypeModel databaseType = new();
+    MonitorTypeModel databaseSpaceType = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Initialization();
+        await Task.Yield();
+    }
+
+    void Initialization()
+    {
+        int normalCount = new Random().Next(40,80); // 正常主機數量
+        int abnormalCount = new Random().Next(2, 5); ; // 異常主機數量
+        summary監控機台.BuildSummaryDataModel(normalCount, SummaryDataModelEnum.正常主機);
+        summary異常機台.BuildSummaryDataModel(abnormalCount, SummaryDataModelEnum.異常主機);
+        percentData.Build(normalCount, abnormalCount);
+        serviceType.Build(MonitorTypeNodeCategoryEnum.Service);
+        memoryType.Build(MonitorTypeNodeCategoryEnum.Memory);
+        cpuType.Build(MonitorTypeNodeCategoryEnum.Cpu);
+        diskType.Build(MonitorTypeNodeCategoryEnum.Disk);
+        databaseType.Build(MonitorTypeNodeCategoryEnum.Database);
+        databaseSpaceType.Build(MonitorTypeNodeCategoryEnum.DatabaseSpace);
+    }
+
+    void OnRefresh(object obj)
+    {
+       Initialization();
+       // 刷新邏輯
+        StateHasChanged();
+    }
+}

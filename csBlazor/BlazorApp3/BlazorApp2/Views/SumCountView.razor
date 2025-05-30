@@ -1,0 +1,17 @@
+﻿<div style="width: 180px; font-family: Arial, sans-serif; border-radius: 8px; overflow: hidden; border: 1px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <!-- 標題部分 - 淺綠色背景 -->
+    <div style="background-color: @Data.TotalHostsColor; padding: 8px 12px; text-align: center; font-weight: bold; font-size: 24px; color: #333;">
+        @Data.Title
+    </div>
+
+    <!-- 數值部分 - 白色背景 -->
+    <div style="background-color: white; padding: 15px; display: flex; justify-content: center; align-items: center;">
+        <span style="font-size: 80px; font-weight: bold; color: #000;">@Data.HostsCount</span>
+    </div>
+</div>
+
+@code{
+    [Parameter]
+    public SummaryDataModel Data { get; set; }
+
+}

@@ -1,0 +1,48 @@
+﻿<style>
+    .header-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #e6e6e6;
+        padding: 16px;
+    }
+
+    .header-title {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+    }
+
+    .header-logo {
+        height: 64px;
+        margin-right: 8px;
+    }
+
+    .header-company {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+</style>
+
+<div>
+    <div class="header-container">
+        <span class="header-title" @onclick=OnRefresh>工程部監控系統</span>
+        <div class="header-right">
+            <img src="images/header.png" alt="eXentric Logo" class="header-logo" />
+            <span class="header-company">耀查科技股份有限公司</span>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public EventCallback<object> OnClickCallback { get; set; }
+
+    private void OnRefresh()
+    {
+        OnClickCallback.InvokeAsync();
+    }
+}

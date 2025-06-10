@@ -2,7 +2,8 @@
 
 @inject NavigationManager NavigationManager
 
-@inject csBlazorRoutingParameter.Services.ProductService ProductService
+@inject csBlazorQueryString.Services.ProductService ProductService
+@inject ILogger<ProductListPage> Logger
 
 <h3>產品清單</h3>
 
@@ -20,7 +21,7 @@
         @foreach (var product in products)
         {
             <tr class="cursor-pointer"
-            @onclick="()=>OnProductSelected(product)">
+                @onclick="() => OnProductSelected(product)">
                 <td>@product.Id</td>
                 <td>@product.Name</td>
                 <td>@product.Price.ToString("C")</td>
@@ -49,6 +50,13 @@
     void OnProductSelected(Product product)
     {
         // 導航到產品詳細頁面，並傳遞產品 ID
-        NavigationManager.NavigateTo($"/product/{product.Id}");
+        var queryParams = new Dictionary<string, object?>
+        {
+            ["id"] = product.Id
+        };
+
+        var uri = NavigationManager.GetUriWithQueryParameters("product", queryParams);
+        Logger.LogInformation("Navigating Uri: {uri}", uri);
+        NavigationManager.NavigateTo(uri);
     }
 }

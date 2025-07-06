@@ -33,7 +33,7 @@ namespace csSTTAllInOne
             // 取得 ILogger 實例
             var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
-            logger.LogInformation("AI 會議記錄 Ver 1.0.20250509 By Vulcan Lee");
+            logger.LogInformation("AI 會議記錄 Ver 1.2.20250706 By Vulcan Lee");
             logger.LogInformation("應用程式啟動中...");
 
             // 使用其他服務
@@ -41,7 +41,7 @@ namespace csSTTAllInOne
 
             await speechToTextService.InitializeAsync();
             await speechToTextService.ConvertToWavAsync();
-            //await speechToTextService.BuildAsync();
+            await speechToTextService.BuildAsync();
         }
     }
 }

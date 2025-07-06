@@ -133,7 +133,7 @@ public class SpeechToTextService
         }
 
     }
-   
+
     public async Task<string> ProcessAsync(string filename)
     {
         string result = string.Empty;
@@ -228,7 +228,12 @@ public class SpeechToTextService
                 maxSpeakerCount = 10, // 最大说话人数量
                 addSentiment = true, // 启用情感分析
                 profanityFilterMode = "Masked", // 启用脏话过滤
-                                                // 多语言识别
+                // 增加說話人分離的敏感度設定
+                speechContext = new
+                {
+                    phrases = new string[] { } // 可以加入特定詞彙提高識別率
+                },
+                // 多语言识别
                 languageIdentification = new
                 {
                     candidateLocales = new[] { "zh-TW", "zh-CN", "en-US" },
@@ -303,8 +308,14 @@ public class SpeechToTextService
                                     var timeOffset = TimeSpan.FromTicks(phrase.OffsetInTicks);
                                     var duration = TimeSpan.FromTicks(phrase.DurationInTicks);
 
+                                    // 增加偵錯日誌
+                                    logger.LogInformation($"檢測到說話人 {phrase.Speaker}，置信度: {bestResult.Confidence:P2}");
+
                                     if (allSpeakers.Contains($"說話人 {phrase.Speaker}") == false)
+                                    {
                                         allSpeakers.Add($"說話人 {phrase.Speaker}");
+                                        logger.LogInformation($"新增說話人 {phrase.Speaker} 到清單中，目前共有 {allSpeakers.Count} 位說話人");
+                                    }
 
                                     //speakerTexts.Add($"說話人 {phrase.Speaker} [{timeOffset:hh\\:mm\\:ss}-{timeOffset.Add(duration):hh\\:mm\\:ss}]:");
                                     //speakerTexts.Add($"說話人 {phrase.Speaker} [{timeOffset:hh\\:mm\\:ss}-{timeOffset.Add(duration):hh\\:mm\\:ss}]:");
@@ -315,8 +326,7 @@ public class SpeechToTextService
                                     {
                                         speakerTexts.Add($"情感分析: 正面({bestResult.Sentiment.Positive:P1}) 中性({bestResult.Sentiment.Neutral:P1}) 負面({bestResult.Sentiment.Negative:P1})");
                                     }
-
-                                    speakerTexts.Add(""); // 空行分隔
+                                    //speakerTexts.Add(""); // 空行分隔
                                 }
                             }
 

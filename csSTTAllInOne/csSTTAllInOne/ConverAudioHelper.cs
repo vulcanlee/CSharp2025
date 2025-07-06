@@ -17,7 +17,7 @@ namespace csSTTAllInOne
             // 影片格式
             ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm", ".3gp",
             ".m4v", ".ts", ".mts", ".m2ts"
-        };
+        }; 
         public async Task ConvertToWav()
         {
             string currentDirectory = Directory.GetCurrentDirectory();
@@ -52,7 +52,8 @@ namespace csSTTAllInOne
                         .OutputToFile(outputPath, overwrite: true, options => options
                             //.WithAudioCodec(AudioCodec.pcm_s16le)
                             .WithAudioCodec(FFMpeg.GetCodec("pcm_s16le"))
-                            .WithAudioSamplingRate(44100)
+                            //.WithAudioSamplingRate(44100)
+                            .WithAudioSamplingRate(16000)
                             .WithCustomArgument("-ac 1")      // 單聲道
                             )
                         .ProcessAsynchronously();

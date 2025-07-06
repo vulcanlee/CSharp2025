@@ -10,9 +10,70 @@ namespace csSTTAllInOne;
 // 定義 JSON 結構對應的 POCO
 class TranscriptionJson
 {
+    [JsonProperty("recognizedPhrases")]
+    public RecognizedPhrase[] RecognizedPhrases { get; set; }
+
     [JsonProperty("combinedRecognizedPhrases")]
     public CombinedPhrase[] CombinedRecognizedPhrases { get; set; }
 }
+
+class RecognizedPhrase
+{
+    [JsonProperty("channel")]
+    public int Channel { get; set; }
+
+    [JsonProperty("speaker")]
+    public int Speaker { get; set; }
+
+    [JsonProperty("offset")]
+    public string Offset { get; set; }
+
+    [JsonProperty("duration")]
+    public string Duration { get; set; }
+
+    [JsonProperty("offsetInTicks")]
+    public long OffsetInTicks { get; set; }
+
+    [JsonProperty("durationInTicks")]
+    public long DurationInTicks { get; set; }
+
+    [JsonProperty("nBest")]
+    public NBest[] NBest { get; set; }
+}
+
+class NBest
+{
+    [JsonProperty("confidence")]
+    public double Confidence { get; set; }
+
+    [JsonProperty("lexical")]
+    public string Lexical { get; set; }
+
+    [JsonProperty("itn")]
+    public string ITN { get; set; }
+
+    [JsonProperty("maskedITN")]
+    public string MaskedITN { get; set; }
+
+    [JsonProperty("display")]
+    public string Display { get; set; }
+
+    [JsonProperty("sentiment")]
+    public Sentiment Sentiment { get; set; }
+}
+
+class Sentiment
+{
+    [JsonProperty("negative")]
+    public double Negative { get; set; }
+
+    [JsonProperty("neutral")]
+    public double Neutral { get; set; }
+
+    [JsonProperty("positive")]
+    public double Positive { get; set; }
+}
+
 class CombinedPhrase
 {
     [JsonProperty("channel")]
@@ -24,19 +85,39 @@ class CombinedPhrase
 public class SpeechToTextService
 {
     private readonly ILogger<SpeechToTextService> logger;
+    private readonly FFmpegDownloader fFmpegDownloader;
+    private readonly ConverAudioHelper converAudioHelper;
     List<string> audioFiles = new List<string>();
-    public SpeechToTextService(ILogger<SpeechToTextService> logger)
+    public SpeechToTextService(ILogger<SpeechToTextService> logger,
+        FFmpegDownloader fFmpegDownloader, ConverAudioHelper converAudioHelper)
     {
         this.logger = logger;
+        this.fFmpegDownloader = fFmpegDownloader;
+        this.converAudioHelper = converAudioHelper;
+    }
+
+    public async Task InitializeAsync()
+    {
+        // 確保 FFmpeg 已經下載
+        await fFmpegDownloader.DownloadFFmpegAsync();
+        logger.LogInformation("FFMpeg檔案已準備好了");
+    }
+
+    public async Task ConvertToWavAsync()
+    {
+        // 確保音訊檔案已經轉換為 WAV 格式
+        await converAudioHelper.ConvertToWav();
+        logger.LogInformation("音訊檔案已轉換為 WAV 格式");
+
     }
 
     public async Task BuildAsync()
     {
         string currentDirectory = Directory.GetCurrentDirectory();
-        audioFiles = Directory.GetFiles(currentDirectory, "*.mp3").ToList();
+        audioFiles = Directory.GetFiles(currentDirectory, "*.wav").ToList();
         if (audioFiles.Count == 0)
         {
-            logger.LogError("沒有找到音檔，請確認當前目錄是否有 mp3 檔案");
+            logger.LogError("沒有找到音檔，請確認當前目錄是否有 wav 檔案");
             return;
         }
         else
@@ -52,6 +133,7 @@ public class SpeechToTextService
         }
 
     }
+   
     public async Task<string> ProcessAsync(string filename)
     {
         string result = string.Empty;
@@ -140,13 +222,13 @@ public class SpeechToTextService
             description = "含说话人分离的会议内容转录",
             properties = new
             {
-                diarizationEnabled = false,
-                wordLevelTimestampsEnabled = false,
-                punctuationMode = "DictatedAndAutomatic",
-                //maxSpeakerCount = 10, // 最大说话人数量
+                diarizationEnabled = true, // 是否啟用說話人分離
+                wordLevelTimestampsEnabled = false, // 是否啟用單詞級時間戳
+                punctuationMode = "DictatedAndAutomatic", // 啟用標點符號
+                maxSpeakerCount = 10, // 最大说话人数量
                 addSentiment = true, // 启用情感分析
                 profanityFilterMode = "Masked", // 启用脏话过滤
-                // 多语言识别
+                                                // 多语言识别
                 languageIdentification = new
                 {
                     candidateLocales = new[] { "zh-TW", "zh-CN", "en-US" },
@@ -156,36 +238,6 @@ public class SpeechToTextService
                 // 结果存储
                 timeToLive = "P1D",  // 保留结果1天
             }
-
-
-            //contentUrls = new[] { AudioFileSasUri },
-            //locale = "zh-TW",
-            //displayName = "详细会议记录",
-            //description = "含说话人分离的会议内容转录",
-            //properties = new
-            //{
-            //    // 基本处理选项
-            //    diarizationEnabled = true, // 启用说话人分离
-            //    wordLevelTimestampsEnabled = false, // 启用单词级时间戳
-            //    punctuationMode = "DictatedAndAutomatic", // 启用标点符号
-            //    //profanityFilterMode = "Masked",  
-
-            //    // 高级选项
-            //    addSentiment = true, // 启用情感分析
-            //    maxSpeakerCount = 10, // 最大说话人数量
-            //    phraseOutputFormat = "Detailed", // 输出格式为详细模式
-
-            //    // 多语言识别
-            //    //languageIdentification = new
-            //    //{
-            //    //    candidateLocales = new[] { "zh-TW", "zh-CN", "en-US" },
-            //    //    mode = "Continuous"
-            //    //},
-
-            //    // 结果存储
-            //    timeToLive = "P1D",  // 保留结果1天
-            //    //destinationContainerUrl = "容器SAS URI"
-            //}
         };
 
         var jsonContent = new StringContent(JsonConvert.SerializeObject(createBody));
@@ -194,8 +246,6 @@ public class SpeechToTextService
         createResponse.EnsureSuccessStatusCode();
 
         var createResult = await createResponse.Content.ReadAsStringAsync();
-        //logger.LogInformation("已建立批次轉錄工作：");
-        //logger.LogInformation(createResult);
 
         // 解析 self URL
         dynamic createJson = JsonConvert.DeserializeObject(createResult);
@@ -206,6 +256,8 @@ public class SpeechToTextService
         logger.LogInformation("開始輪詢轉錄狀態…");
         TimeSpan elapsedTime;
         DateTime startTime = DateTime.Now;
+        List<string> allSpeakers = new();
+
         while (true)
         {
             elapsedTime = DateTime.Now - startTime;
@@ -236,49 +288,55 @@ public class SpeechToTextService
                     {
                         var fileUrl = (string)file.links.contentUrl;
                         var transcriptionResult = await client.GetStringAsync(fileUrl);
-                        //Console.WriteLine("---- 轉錄結果 ----");
-                        //Console.WriteLine(transcriptionResult);
-
-                        // 取得最終錄音文字
-                        // 反序列化
-                        //{
-                        //                            "durationInTicks": 46800000,
-                        //  "durationMilliseconds": 4680,
-                        //  "duration": "PT4.68S",
-                        //  "combinedRecognizedPhrases": [
-                        //    {
-                        //                                "channel": 0,
-                        //      "lexical": "這 裡 要 做 一 些 測 試 o k",
-                        //      "itn": "這 裡 要 做 一 些 測 試 OK",
-                        //      "maskedITN": "這裡要做一些測試ok",
-                        //      "display": "這裡要做一些測試，OK？"
-                        //    },
-                        //    {
-                        //                                "channel": 1,
-                        //      "lexical": "這 裡 要 做 一 些 測 試 o k",
-                        //      "itn": "這 裡 要 做 一 些 測 試 OK",
-                        //      "maskedITN": "這裡要做一些測試ok",
-                        //      "display": "這裡要做一些測試，OK？"
-                        //    }
-                        //  ]
-                        //}
                         var resultObj = JsonConvert.DeserializeObject<TranscriptionJson>(transcriptionResult);
 
-                        // 這裡想要得到的結果是：
-                        //channel 0:
-                        //這裡要做一些測試，OK？
-                        //channel 1:
-                        //這裡要做一些測試，OK？
+                        // 使用 recognizedPhrases 來取得說話人分離資訊
+                        if (resultObj.RecognizedPhrases != null && resultObj.RecognizedPhrases.Length > 0)
+                        {
+                            var speakerTexts = new List<string>();
 
-                        // 使用 Linq 來組合 fullText，包含 channel 資訊與 display 文字
-                        string fullText = string.Join(Environment.NewLine,
-                            resultObj.CombinedRecognizedPhrases
-                                     .Select(p => $"channel {p.Channel}:\n{p.Display?.Trim()}\n\n")
-                                     .Where(s => !string.IsNullOrEmpty(s))
-                        );
-                        //logger.LogInformation("---- 完整轉錄文字 ----");
-                        //logger.LogInformation(fullText);
-                        result = fullText;
+                            foreach (var phrase in resultObj.RecognizedPhrases)
+                            {
+                                if (phrase.NBest != null && phrase.NBest.Length > 0)
+                                {
+                                    var bestResult = phrase.NBest[0]; // 取最佳結果
+                                    var timeOffset = TimeSpan.FromTicks(phrase.OffsetInTicks);
+                                    var duration = TimeSpan.FromTicks(phrase.DurationInTicks);
+
+                                    if (allSpeakers.Contains($"說話人 {phrase.Speaker}") == false)
+                                        allSpeakers.Add($"說話人 {phrase.Speaker}");
+
+                                    //speakerTexts.Add($"說話人 {phrase.Speaker} [{timeOffset:hh\\:mm\\:ss}-{timeOffset.Add(duration):hh\\:mm\\:ss}]:");
+                                    //speakerTexts.Add($"說話人 {phrase.Speaker} [{timeOffset:hh\\:mm\\:ss}-{timeOffset.Add(duration):hh\\:mm\\:ss}]:");
+                                    speakerTexts.Add($"說話人{phrase.Speaker} : {bestResult.Display?.Trim()}");
+
+                                    // 如果有情感分析結果，也加入
+                                    if (bestResult.Sentiment != null)
+                                    {
+                                        speakerTexts.Add($"情感分析: 正面({bestResult.Sentiment.Positive:P1}) 中性({bestResult.Sentiment.Neutral:P1}) 負面({bestResult.Sentiment.Negative:P1})");
+                                    }
+
+                                    speakerTexts.Add(""); // 空行分隔
+                                }
+                            }
+
+                            result = string.Join(Environment.NewLine, speakerTexts);
+                            string allSpeakerText = string.Join(Environment.NewLine, allSpeakers);
+                            result = $"發言者清單{Environment.NewLine}{allSpeakerText}" +
+                                $"{Environment.NewLine}{Environment.NewLine}{result}";
+
+                        }
+                        else
+                        {
+                            // 如果沒有 recognizedPhrases，退回使用 combinedRecognizedPhrases
+                            string fullText = string.Join(Environment.NewLine,
+                                resultObj.CombinedRecognizedPhrases
+                                         .Select(p => $"channel {p.Channel}:\n{p.Display?.Trim()}\n\n")
+                                         .Where(s => !string.IsNullOrEmpty(s))
+                            );
+                            result = fullText;
+                        }
+
                         logger.LogInformation("---- 轉錄完成 ----");
                     }
                 }
@@ -299,8 +357,9 @@ public class SpeechToTextService
     async Task Save(string filename, string content)
     {
         // 儲存轉錄結果到檔案
-        string filenameRaw = filename.Replace(".mp3", " RAW.md");
-        string filenameGpt = filename.Replace(".mp3", " GPT.md");
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
+        string filenameRaw = $"{fileNameWithoutExtension} RAW.md";
+        string filenameGpt = $"{fileNameWithoutExtension} GPT.md";
         string outputPath = Path.Combine(Directory.GetCurrentDirectory(), filenameRaw);
         using (StreamWriter writer = new StreamWriter(outputPath))
         {
@@ -310,7 +369,7 @@ public class SpeechToTextService
         outputPath = Path.Combine(Directory.GetCurrentDirectory(), filenameGpt);
         using (StreamWriter writer = new StreamWriter(outputPath))
         {
-            await writer.WriteAsync("將這份錄音文稿，整理出一份會議紀錄，說明此次會議的主題、問題處理狀況、討論的重點、代辦事項、決議或者確認事項、潛在問題或疑問、其他補充事項\r\n");
+            await writer.WriteAsync("將這份錄音文稿，整理出一份會議紀錄，說明此次會議的主題、問題處理狀況、討論的重點、代辦事項、決議或者確認事項、潛在問題或疑問、其他補充事項\r\n\r\n");
         }
     }
 }

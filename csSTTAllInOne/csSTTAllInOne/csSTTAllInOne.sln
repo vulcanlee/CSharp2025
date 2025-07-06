@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csSTTAllInOne", "csSTTAllInOne.csproj", "{763FF528-35E8-BBB8-3CEB-4FD204A8446C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{763FF528-35E8-BBB8-3CEB-4FD204A8446C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{763FF528-35E8-BBB8-3CEB-4FD204A8446C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{763FF528-35E8-BBB8-3CEB-4FD204A8446C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{763FF528-35E8-BBB8-3CEB-4FD204A8446C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B9F4C1A0-B0EB-4E2C-B2CA-DBBD61578992}
+	EndGlobalSection
+EndGlobal

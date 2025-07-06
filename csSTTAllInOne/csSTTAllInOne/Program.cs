@@ -21,6 +21,8 @@ namespace csSTTAllInOne
 
             // 註冊其他服務
             serviceCollection.AddSingleton<SpeechToTextService>();
+            serviceCollection.AddSingleton<FFmpegDownloader>();
+            serviceCollection.AddSingleton<ConverAudioHelper>();
 
 
 
@@ -37,7 +39,9 @@ namespace csSTTAllInOne
             // 使用其他服務
             var speechToTextService = serviceProvider.GetRequiredService<SpeechToTextService>();
 
-            await speechToTextService.BuildAsync();
+            await speechToTextService.InitializeAsync();
+            await speechToTextService.ConvertToWavAsync();
+            //await speechToTextService.BuildAsync();
         }
     }
 }

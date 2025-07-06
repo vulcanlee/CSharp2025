@@ -40,8 +40,8 @@ namespace csSTTAllInOne
             var speechToTextService = serviceProvider.GetRequiredService<SpeechToTextService>();
 
             await speechToTextService.InitializeAsync();
-            await speechToTextService.ConvertToWavAsync();
-            await speechToTextService.BuildAsync();
+            await speechToTextService.ConvertToMp3Async();
+            await speechToTextService.BuildAsync("mp3");
         }
     }
 }

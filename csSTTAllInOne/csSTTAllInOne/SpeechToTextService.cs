@@ -111,13 +111,21 @@ public class SpeechToTextService
 
     }
 
-    public async Task BuildAsync()
+    public async Task ConvertToMp3Async()
+    {
+        // 確保音訊檔案已經轉換為 MP3 格式
+        await converAudioHelper.ConvertToMp3();
+        logger.LogInformation("音訊檔案已轉換為 MP3 格式");
+
+    }
+
+    public async Task BuildAsync(string audioFileType)
     {
         string currentDirectory = Directory.GetCurrentDirectory();
-        audioFiles = Directory.GetFiles(currentDirectory, "*.wav").ToList();
+        audioFiles = Directory.GetFiles(currentDirectory, $"*.{audioFileType}").ToList();
         if (audioFiles.Count == 0)
         {
-            logger.LogError("沒有找到音檔，請確認當前目錄是否有 wav 檔案");
+            logger.LogError($"沒有找到音檔，請確認當前目錄是否有 {audioFileType} 檔案");
             return;
         }
         else
@@ -127,20 +135,20 @@ public class SpeechToTextService
                 logger.LogInformation("找到音檔：{0}", file);
                 string fileItem = Path.GetFileName(file);
                 string filename = Path.Combine(currentDirectory, fileItem);
-                string textScript = await ProcessAsync(filename);
+                string textScript = await ProcessAsync(filename, audioFileType);
                 logger.LogInformation("語音文稿解析完成 ： {0}", fileItem);
             }
         }
 
     }
 
-    public async Task<string> ProcessAsync(string filename)
+    public async Task<string> ProcessAsync(string filename,string audioFileType)
     {
         string result = string.Empty;
         // 1. 上傳音檔到 Azure Blob Storage
         string sasToken = await UploadToAzureBlobStorage(filename);
         // 2. 轉錄音檔
-        result = await ParseSpeechToText(sasToken);
+        result = await ParseSpeechToText(sasToken, audioFileType);
         await Save(filename, result);
         return result;
     }
@@ -198,7 +206,7 @@ public class SpeechToTextService
         return result;
     }
 
-    async Task<string> ParseSpeechToText(string sasToken)
+    async Task<string> ParseSpeechToText(string sasToken, string audioFileType)
     {
         string result = string.Empty;
 
@@ -214,38 +222,80 @@ public class SpeechToTextService
 
         // 1. 建立轉錄工作
         var createUrl = $"https://{ServiceRegion}.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions";
-        var createBody = new
+
+        dynamic createBody = new { };
+        if ( audioFileType == "mp3")
         {
-            contentUrls = new[] { AudioFileSasUri },
-            locale = "zh-TW",
-            displayName = "My Batch Transcription",
-            description = "含说话人分离的会议内容转录",
-            properties = new
+            createBody = new
             {
-                diarizationEnabled = true, // 是否啟用說話人分離
-                wordLevelTimestampsEnabled = false, // 是否啟用單詞級時間戳
-                punctuationMode = "DictatedAndAutomatic", // 啟用標點符號
-                maxSpeakerCount = 10, // 最大说话人数量
-                addSentiment = true, // 启用情感分析
-                profanityFilterMode = "Masked", // 启用脏话过滤
-                // 增加說話人分離的敏感度設定
-                speechContext = new
+                contentUrls = new[] { AudioFileSasUri },
+                locale = "zh-TW",
+                displayName = "My Batch Transcription",
+                description = "含说话人分离的会议内容转录",
+                properties = new
                 {
-                    phrases = new string[] { } // 可以加入特定詞彙提高識別率
-                },
-                // 多语言识别
-                languageIdentification = new
+                    diarizationEnabled = false, // 是否啟用說話人分離
+                    wordLevelTimestampsEnabled = false, // 是否啟用單詞級時間戳
+                    punctuationMode = "DictatedAndAutomatic", // 啟用標點符號
+                    maxSpeakerCount = 10, // 最大说话人数量
+                    addSentiment = true, // 启用情感分析
+                    profanityFilterMode = "Masked", // 启用脏话过滤
+                                                    // 增加說話人分離的敏感度設定
+                    // 多语言识别
+                    languageIdentification = new
+                    {
+                        candidateLocales = new[] { "zh-TW", "zh-CN", "en-US" },
+                        mode = "Continuous"
+                    },
+
+                    // 结果存储
+                    timeToLive = "P1D",  // 保留结果1天
+                }
+            };
+        }
+        else if (audioFileType == "wav")
+        {
+            createBody = new
+            {
+                contentUrls = new[] { AudioFileSasUri },
+                locale = "zh-TW",
+                displayName = "My Batch Transcription",
+                description = "含说话人分离的会议内容转录",
+                properties = new
                 {
-                    candidateLocales = new[] { "zh-TW", "zh-CN", "en-US" },
-                    mode = "Continuous"
-                },
+                    diarizationEnabled = true, // 是否啟用說話人分離
+                    wordLevelTimestampsEnabled = false, // 是否啟用單詞級時間戳
+                    punctuationMode = "DictatedAndAutomatic", // 啟用標點符號
+                    maxSpeakerCount = 10, // 最大说话人数量
+                    addSentiment = true, // 启用情感分析
+                    profanityFilterMode = "Masked", // 启用脏话过滤
+                                                    // 增加說話人分離的敏感度設定
+                    speechContext = new
+                    {
+                        phrases = new string[] { } // 可以加入特定詞彙提高識別率
+                    },
+                    // 多语言识别
+                    languageIdentification = new
+                    {
+                        candidateLocales = new[] { "zh-TW", "zh-CN", "en-US" },
+                        mode = "Continuous"
+                    },
 
-                // 结果存储
-                timeToLive = "P1D",  // 保留结果1天
-            }
-        };
+                    // 结果存储
+                    timeToLive = "P1D",  // 保留结果1天
+                }
+            };
+        }
 
-        var jsonContent = new StringContent(JsonConvert.SerializeObject(createBody));
+        StringContent jsonContent = new StringContent(JsonConvert.SerializeObject(createBody));
+        //if (audioFileType == "mp3")
+        //{
+        //    jsonContent = new StringContent(JsonConvert.SerializeObject(createBody));
+        //}
+        //else if (audioFileType == "wav")
+        //{
+        //    jsonContent = new StringContent(JsonConvert.SerializeObject(createBody));
+        //}
         jsonContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var createResponse = await client.PostAsync(createUrl, jsonContent);
         createResponse.EnsureSuccessStatusCode();
@@ -319,7 +369,15 @@ public class SpeechToTextService
 
                                     //speakerTexts.Add($"說話人 {phrase.Speaker} [{timeOffset:hh\\:mm\\:ss}-{timeOffset.Add(duration):hh\\:mm\\:ss}]:");
                                     //speakerTexts.Add($"說話人 {phrase.Speaker} [{timeOffset:hh\\:mm\\:ss}-{timeOffset.Add(duration):hh\\:mm\\:ss}]:");
-                                    speakerTexts.Add($"說話人{phrase.Speaker} : {bestResult.Display?.Trim()}");
+                                    if(audioFileType == "mp3")
+                                    {
+                                        speakerTexts.Add($"{bestResult.Display?.Trim()}");
+                                    }
+                                    else if (audioFileType == "wav")
+                                    {
+                                        speakerTexts.Add($"說話人 {phrase.Speaker} [{timeOffset:hh\\:mm\\:ss}-{timeOffset.Add(duration):hh\\:mm\\:ss}]:");
+                                        speakerTexts.Add($"說話人{phrase.Speaker} : {bestResult.Display?.Trim()}");
+                                    }
 
                                     // 如果有情感分析結果，也加入
                                     if (bestResult.Sentiment != null)
@@ -332,8 +390,11 @@ public class SpeechToTextService
 
                             result = string.Join(Environment.NewLine, speakerTexts);
                             string allSpeakerText = string.Join(Environment.NewLine, allSpeakers);
-                            result = $"發言者清單{Environment.NewLine}{allSpeakerText}" +
-                                $"{Environment.NewLine}{Environment.NewLine}{result}";
+                            if (audioFileType == "wav")
+                            {
+                                result = $"發言者清單{Environment.NewLine}{allSpeakerText}" +
+                   $"{Environment.NewLine}{Environment.NewLine}{result}";
+                            }
 
                         }
                         else

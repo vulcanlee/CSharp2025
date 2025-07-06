@@ -1,0 +1,62 @@
+﻿@page "/ProductList"
+
+@inject NavigationManager NavigationManager
+
+@inject csBlazorQueryString.Services.ProductService ProductService
+@inject ILogger<ProductListPage> Logger
+
+<h3>產品清單</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>產品 ID</th>
+            <th>產品名稱</th>
+            <th>價格</th>
+            <th>庫存數量</th>
+            <th>上架日期</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in products)
+        {
+            <tr class="cursor-pointer"
+                @onclick="() => OnProductSelected(product)">
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.Price.ToString("C")</td>
+                <td>@product.StockQuantity</td>
+                <td>@product.LaunchDate.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
+@code {
+
+    private List<Product> products = new();
+
+    protected override void OnInitialized()
+    {
+        products = ProductService.Products;
+    }
+
+    void OnProductSelected(Product product)
+    {
+        // 導航到產品詳細頁面，並傳遞產品 ID
+        var queryParams = new Dictionary<string, object?>
+        {
+            ["id"] = product.Id
+        };
+
+        var uri = NavigationManager.GetUriWithQueryParameters("product", queryParams);
+        Logger.LogInformation("Navigating Uri: {uri}", uri);
+        NavigationManager.NavigateTo(uri);
+    }
+}

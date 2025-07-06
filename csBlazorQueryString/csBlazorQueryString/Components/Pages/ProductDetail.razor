@@ -1,0 +1,56 @@
+﻿@page "/product"
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Routing
+@inject NavigationManager NavigationManager
+
+@inject csBlazorQueryString.Services.ProductService ProductService
+
+<div class="container mt-4">
+    @if (product != null)
+    {
+        <h3>產品詳細資訊</h3>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">@product.Name</h5>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <p><strong>產品 ID:</strong> @product.Id</p>
+                        <p><strong>價格:</strong> @product.Price.ToString("C")</p>
+                        <p><strong>庫存數量:</strong> @product.StockQuantity</p>
+                        <p><strong>上架日期:</strong> @product.LaunchDate.ToShortDateString()</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p>找不到指定產品。</p>
+    }
+
+    <div class="mt-3">
+        <button class="btn btn-primary" @onclick="NavigateToProductList">返回產品清單</button>
+    </div>
+</div>
+
+@code {
+    // [SupplyParameterFromQuery(Name = "id")]
+    // public int Id { get; set; }
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    private Product? product;
+
+    // 當參數變更時執行
+    protected override void OnParametersSet()
+    {
+        var products = ProductService.Products;
+        product = products.FirstOrDefault(p => p.Id == Id);
+    }
+
+    // 返回產品清單頁面
+    private void NavigateToProductList()
+    {
+        NavigationManager.NavigateTo("/ProductList");
+    }
+}

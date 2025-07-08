@@ -1,4 +1,6 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure;
+using Azure.Storage;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 using Microsoft.Extensions.Logging;
@@ -142,7 +144,7 @@ public class SpeechToTextService
 
     }
 
-    public async Task<string> ProcessAsync(string filename,string audioFileType)
+    public async Task<string> ProcessAsync(string filename, string audioFileType)
     {
         string result = string.Empty;
         // 1. 上傳音檔到 Azure Blob Storage
@@ -156,53 +158,107 @@ public class SpeechToTextService
     async Task<string> UploadToAzureBlobStorage(string filename)
     {
         string result = string.Empty;
-        // 讀取環境變數內的 Azure Blob Storage 的連線字串
-        string connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
-        string containerName = "audio-files";     // 要上傳到的 container
-        // 取得當前目錄
-        string currentDirectory = Directory.GetCurrentDirectory();
-        string localFilePath = Path.Combine(Directory.GetCurrentDirectory(), filename);
-        string blobName = Path.GetFileName(localFilePath); // blob 名稱
+        try
+        {
+            // 配置 BlobClientOptions 以增加逾時時間和重試策略
+            var blobClientOptions = new BlobClientOptions()
+            {
+                Retry = {
+                Delay = TimeSpan.FromSeconds(2),        // 重試間隔
+                MaxDelay = TimeSpan.FromSeconds(30),    // 最大重試間隔
+                MaxRetries = 5,                         // 最大重試次數
+                NetworkTimeout = TimeSpan.FromMinutes(10) // 網路逾時設為 10 分鐘
+            }
+            };
 
-        // --------------------------------
+            // 讀取環境變數內的 Azure Blob Storage 的連線字串
+            string connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
+            string containerName = "audio-files";     // 要上傳到的 container
+                                                      // 取得當前目錄
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string localFilePath = Path.Combine(Directory.GetCurrentDirectory(), filename);
+            string blobName = Path.GetFileName(localFilePath); // blob 名稱
 
-        // 建立 BlobServiceClient (方法 A)
-        var blobServiceClient = new BlobServiceClient(connectionString);
+            // 取得檔案大小以決定上傳策略
+            var fileInfo = new FileInfo(localFilePath);
+            long fileSize = fileInfo.Length;
+            // --------------------------------
 
-        // 取得 container client，若 container 不存在則自動建立
-        var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
-        await containerClient.CreateIfNotExistsAsync(PublicAccessType.None);
+            // 建立 BlobServiceClient (方法 A)
+            var blobServiceClient = new BlobServiceClient(connectionString, blobClientOptions);
 
-        // 取得指定 blob 的 client
-        var blobClient = containerClient.GetBlobClient(blobName);
+            // 取得 container client，若 container 不存在則自動建立
+            var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+            await containerClient.CreateIfNotExistsAsync(PublicAccessType.None);
 
-        logger.LogInformation($"開始上傳 {localFilePath} → {containerClient.Uri}/{blobName} ...");
+            // 取得指定 blob 的 client
+            var blobClient = containerClient.GetBlobClient(blobName);
 
-        // 以檔案串流上傳，並設定 ContentType 以利瀏覽器正確播放
-        using FileStream uploadFileStream = File.OpenRead(localFilePath);
-        var blobHttpHeaders = new BlobHttpHeaders { ContentType = "audio/mpeg" };
+            logger.LogInformation($"開始上傳 {localFilePath} → {containerClient.Uri}/{blobName} ...");
 
-        // 如果檔案很大，可以傳入 BlobUploadOptions 並設定 TransferOptions 分段上傳
-        await blobClient.UploadAsync(
-            uploadFileStream,
-            new BlobUploadOptions { HttpHeaders = blobHttpHeaders }
-        );
+            // 以檔案串流上傳，並設定 ContentType 以利瀏覽器正確播放
+            using FileStream uploadFileStream = File.OpenRead(localFilePath);
+            var blobHttpHeaders = new BlobHttpHeaders { ContentType = "audio/mpeg" };
 
-        uploadFileStream.Close();
-        logger.LogInformation("上傳完成！");
+            double lastPercentage = 0.0;
 
-        var blobItemClient = containerClient.GetBlobClient(blobName);
+            // 針對大檔案使用分段上傳
+            var uploadOptions = new BlobUploadOptions
+            {
+                HttpHeaders = blobHttpHeaders,
+                TransferOptions = new StorageTransferOptions
+                {
+                    // 設定分段大小 (4MB)
+                    MaximumTransferSize = 4 * 1024 * 1024,
+                    // 設定平行度
+                    MaximumConcurrency = 4
+                },
+                // 設定進度回報
+                ProgressHandler = new Progress<long>(bytesTransferred =>
+                {
+                    double percentage = (double)bytesTransferred / fileSize * 100;
+                    if (percentage - lastPercentage >= 5.0)
+                    {
+                        logger.LogInformation($"上傳進度: {percentage:F1}% ({bytesTransferred}/{fileSize} bytes)");
+                        lastPercentage = percentage;
+                    }
+                })
+            };
 
-        // 直接拿 URL
-        Uri blobUri = blobItemClient.Uri;
-        Console.WriteLine(blobUri.ToString());
 
-        // 取得與顯示 Blob Storage 的音檔 SAS URI
-        var sasToken = blobItemClient.GenerateSasUri(BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddHours(5));
-        logger.LogInformation($"SAS URI: {sasToken}");
+            // 如果檔案很大，可以傳入 BlobUploadOptions 並設定 TransferOptions 分段上傳
+            await blobClient.UploadAsync(uploadFileStream, uploadOptions);
 
-        result = sasToken.ToString();
+            uploadFileStream.Close();
+            logger.LogInformation("上傳完成！");
 
+            var blobItemClient = containerClient.GetBlobClient(blobName);
+
+            // 直接拿 URL
+            Uri blobUri = blobItemClient.Uri;
+            Console.WriteLine(blobUri.ToString());
+
+            // 取得與顯示 Blob Storage 的音檔 SAS URI
+            var sasToken = blobItemClient.GenerateSasUri(BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddHours(5));
+            logger.LogInformation($"SAS URI: {sasToken}");
+
+            result = sasToken.ToString();
+        }
+        catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+        {
+            logger.LogError($"上傳逾時: {ex.Message}");
+            throw new Exception("檔案上傳逾時，請檢查網路連線或嘗試上傳較小的檔案");
+        }
+        catch (RequestFailedException ex)
+        {
+            logger.LogError($"Azure Storage 請求失敗: {ex.Message}");
+            throw new Exception($"Azure Storage 操作失敗: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"上傳過程中發生錯誤: {ex.Message}");
+            throw;
+        }
         return result;
     }
 
@@ -224,7 +280,7 @@ public class SpeechToTextService
         var createUrl = $"https://{ServiceRegion}.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions";
 
         dynamic createBody = new { };
-        if ( audioFileType == "mp3")
+        if (audioFileType == "mp3")
         {
             createBody = new
             {
@@ -241,7 +297,7 @@ public class SpeechToTextService
                     addSentiment = true, // 启用情感分析
                     profanityFilterMode = "Masked", // 启用脏话过滤
                                                     // 增加說話人分離的敏感度設定
-                    // 多语言识别
+                                                    // 多语言识别
                     languageIdentification = new
                     {
                         candidateLocales = new[] { "zh-TW", "zh-CN", "en-US" },
@@ -369,7 +425,7 @@ public class SpeechToTextService
 
                                     //speakerTexts.Add($"說話人 {phrase.Speaker} [{timeOffset:hh\\:mm\\:ss}-{timeOffset.Add(duration):hh\\:mm\\:ss}]:");
                                     //speakerTexts.Add($"說話人 {phrase.Speaker} [{timeOffset:hh\\:mm\\:ss}-{timeOffset.Add(duration):hh\\:mm\\:ss}]:");
-                                    if(audioFileType == "mp3")
+                                    if (audioFileType == "mp3")
                                     {
                                         speakerTexts.Add($"{bestResult.Display?.Trim()}");
                                     }

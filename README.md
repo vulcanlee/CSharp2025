@@ -14,7 +14,7 @@
 |csBlazorAntDesignQuickStart|使用 Ant Design Blazor 組件快速建立頁面||
 |csBlazorRoutingParameter|Blazor 跳轉 1 : 動態路由參數，傳遞與接收路由參數||
 |csBlazorQueryString|Blazor 跳轉 2 : 導航切換頁面時候，透過查詢字串，傳遞與接收查詢參數||
-||||
+|csPatientCRUD|病人資料 CRUD 操作範例||
 ||||
 ||||
 ||||

@@ -1,6 +1,12 @@
-@WebApiDemo_HostAddress = http://localhost:5281
+@WebApiDemo_HostAddress = https://localhost:7074
 
 GET {{WebApiDemo_HostAddress}}/weatherforecast/
 Accept: application/json
+
+###
+
+@location=kaohsiung
+@currentDateTime=2025-09-01T10:00:00
+GET {{WebApiDemo_HostAddress}}/weatherforecast/GetWeatherByLocationAndDate?location={{location}}&date={{currentDateTime}}
 
 ###

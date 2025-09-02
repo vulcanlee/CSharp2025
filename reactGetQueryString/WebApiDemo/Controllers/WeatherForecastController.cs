@@ -29,5 +29,18 @@ namespace WebApiDemo.Controllers
             })
             .ToArray();
         }
+
+        [HttpGet("GetWeatherByLocationAndDate")]
+        public ActionResult<IEnumerable<WeatherForecast>> GetWeatherByLocationAndDate([FromQuery] string location, [FromQuery] DateOnly date)
+        {
+            // 這裡可以根據地點與日期來產生不同的天氣預報
+            return Ok(Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            {
+                Date = date.AddDays(index),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = Summaries[Random.Shared.Next(Summaries.Length)],
+                Location = location
+            }).ToArray());
+        }
     }
 }

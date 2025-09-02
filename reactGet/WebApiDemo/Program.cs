@@ -39,7 +39,7 @@ namespace WebApiDemo
             app.UseRawHttpLogging();
 
             #region 使用 CORS 中介軟體 - 必須放在管道的早期位置
-           // app.UseCors("AllowReactApp");
+            app.UseCors("AllowReactApp");
             #endregion
 
             app.UseAuthorization();

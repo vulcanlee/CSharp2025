@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiDemo", "WebApiDemo\WebApiDemo.csproj", "{46510BC9-DFF4-4810-9622-B07E3D02CD97}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "reactdemo", "ReactDemo\reactdemo.esproj", "{17BDE256-5760-9F89-7D8C-26886E2D72BE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{46510BC9-DFF4-4810-9622-B07E3D02CD97} = {46510BC9-DFF4-4810-9622-B07E3D02CD97}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

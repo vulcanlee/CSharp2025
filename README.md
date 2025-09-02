@@ -16,7 +16,7 @@
 |csBlazorQueryString|Blazor 跳轉 2 : 導航切換頁面時候，透過查詢字串，傳遞與接收查詢參數||
 |csPatientCRUD|病人資料 CRUD 操作範例||
 |ReactWebApi|前端使用 React，後端使用 ASP.NET Core 的測試標準專案||
-||||
+|reactGet|React API 01 : 呼叫一個 Get 方法 API，並將結果渲染到網頁上||
 ||||
 ||||
 ||||

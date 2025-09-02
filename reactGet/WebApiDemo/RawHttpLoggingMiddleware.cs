@@ -33,14 +33,37 @@ public sealed class RawHttpLoggingMiddleware
         await using var tempResponseBody = new MemoryStream();
         context.Response.Body = tempResponseBody;
 
+        bool responseCopied = false;
+
         try
         {
             await _next(context);
 
-            string responseText = await FormatResponseAsync(context);
+            // 從暫存流讀取完整回應內容
+            tempResponseBody.Position = 0;
+            string bodyText = await ReadBodySafeAsync(context.Response.ContentType, tempResponseBody, tempResponseBody.Length);
+
             var duration = DateTime.UtcNow - startTs;
 
-            // 結構化 logging：三個 placeholder 對應三個參數
+            // 複製到真正輸出（第一次寫入會觸發 OnStarting，例如 CORS 標頭）
+            tempResponseBody.Position = 0;
+            await tempResponseBody.CopyToAsync(originalResponseBody);
+            responseCopied = true;
+
+            // 取得（此時已含 OnStarting 加入的）標頭
+            var res = context.Response;
+            var sb = new StringBuilder()
+                .Append(context.Request.Protocol).Append(' ')
+                .Append(res.StatusCode).Append(' ')
+                .Append(GetReasonPhrase(res.StatusCode)).Append("\r\n");
+
+            foreach (var header in res.Headers)
+                foreach (var value in header.Value)
+                    sb.Append(header.Key).Append(": ").Append(value).Append("\r\n");
+
+            sb.Append("\r\n").Append(bodyText);
+            string responseText = sb.ToString();
+
             _logger.LogInformation(
                 """
 ===== HTTP 交換開始 =====
@@ -58,8 +81,13 @@ public sealed class RawHttpLoggingMiddleware
         }
         finally
         {
-            tempResponseBody.Position = 0;
-            await tempResponseBody.CopyToAsync(originalResponseBody);
+            // 若尚未複製（例如中途異常），仍須把已緩衝的內容送出去
+            if (!responseCopied)
+            {
+                tempResponseBody.Position = 0;
+                await tempResponseBody.CopyToAsync(originalResponseBody);
+            }
+
             context.Response.Body = originalResponseBody;
         }
     }
@@ -84,13 +112,11 @@ public sealed class RawHttpLoggingMiddleware
           .Append(req.Protocol)
           .Append("\r\n");
 
-        // Host 行（HTTP/1.1 Host 為必要；HTTP/2/3 一樣可列出）
         if (!string.IsNullOrEmpty(req.Host.Value))
             sb.Append("Host: ").Append(req.Host.Value).Append("\r\n");
 
         foreach (var header in req.Headers)
         {
-            // Host 已手動處理
             if (string.Equals(header.Key, "Host", StringComparison.OrdinalIgnoreCase))
                 continue;
 
@@ -98,11 +124,10 @@ public sealed class RawHttpLoggingMiddleware
                 sb.Append(header.Key).Append(": ").Append(value).Append("\r\n");
         }
 
-        sb.Append("\r\n"); // 空行分隔
+        sb.Append("\r\n");
         if (!string.IsNullOrEmpty(bodyText))
             sb.Append(bodyText);
 
-        // 重置位置給後續 MVC / Minimal APIs
         req.Body.Position = 0;
         return sb.ToString();
     }
@@ -115,8 +140,6 @@ public sealed class RawHttpLoggingMiddleware
         string bodyText = await ReadBodySafeAsync(res.ContentType, res.Body, res.ContentLength);
 
         var sb = new StringBuilder();
-
-        // ASP.NET Core 不直接暴露協議版本於 Response，此處以 Request 協議為準
         sb.Append(context.Request.Protocol)
           .Append(' ')
           .Append(res.StatusCode)
@@ -125,10 +148,8 @@ public sealed class RawHttpLoggingMiddleware
           .Append("\r\n");
 
         foreach (var header in res.Headers)
-        {
             foreach (var value in header.Value)
                 sb.Append(header.Key).Append(": ").Append(value).Append("\r\n");
-        }
 
         sb.Append("\r\n");
         if (!string.IsNullOrEmpty(bodyText))
@@ -146,7 +167,6 @@ public sealed class RawHttpLoggingMiddleware
         if (IsBinary(contentType))
             return $"(略過二進位內容: {contentType ?? "未知類型"})";
 
-        // 將資料複製到記憶體（不超過限制）
         var ms = new MemoryStream();
         bodyStream.Position = 0;
         await bodyStream.CopyToAsync(ms);
@@ -155,7 +175,6 @@ public sealed class RawHttpLoggingMiddleware
         if (ms.Length == 0)
             return string.Empty;
 
-        // 嘗試判斷是否為可見文字
         if (!LooksLikeText(ms))
             return "(略過非文字內容)";
 
@@ -178,7 +197,6 @@ public sealed class RawHttpLoggingMiddleware
         if (BinaryContentTypes.Contains(contentType))
             return true;
 
-        // 簡單判斷：非 text / json / xml / form / javascript 都視為可能二進位
         if (contentType.StartsWith("text/", StringComparison.OrdinalIgnoreCase))
             return false;
         if (contentType.Contains("json", StringComparison.OrdinalIgnoreCase))
@@ -195,7 +213,6 @@ public sealed class RawHttpLoggingMiddleware
 
     private static bool LooksLikeText(MemoryStream ms)
     {
-        // 簡單啟發式：掃前 512 bytes 是否包含大量 0 或控制碼
         var buf = ms.GetBuffer();
         int len = (int)Math.Min(ms.Length, 512);
         int control = 0;
@@ -208,10 +225,8 @@ public sealed class RawHttpLoggingMiddleware
         return control < 5;
     }
 
-    private static string GetReasonPhrase(int statusCode)
-    {
-        // 常見狀態碼對應（未列出的給空字串）
-        return statusCode switch
+    private static string GetReasonPhrase(int statusCode) =>
+        statusCode switch
         {
             200 => "OK",
             201 => "Created",
@@ -232,7 +247,6 @@ public sealed class RawHttpLoggingMiddleware
             503 => "Service Unavailable",
             _ => string.Empty
         };
-    }
 }
 
 public static class RawHttpLoggingMiddlewareExtensions

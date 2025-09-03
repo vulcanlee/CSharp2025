@@ -1,8 +1,77 @@
 ﻿using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
 using Hl7.Fhir.Serialization;
+using System.Text;
 
 namespace csPatientCRUD;
+
+// HTTP 記錄 Handler
+public class HttpLoggingHandler : DelegatingHandler
+{
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var startTime = DateTime.UtcNow;
+
+        // 記錄請求
+        Console.WriteLine("===== HTTP 請求 =====");
+        Console.WriteLine($"{request.Method} {request.RequestUri}");
+        Console.WriteLine("標頭:");
+        foreach (var header in request.Headers)
+        {
+            Console.WriteLine($"  {header.Key}: {string.Join(", ", header.Value)}");
+        }
+
+        if (request.Content != null)
+        {
+            foreach (var header in request.Content.Headers)
+            {
+                Console.WriteLine($"  {header.Key}: {string.Join(", ", header.Value)}");
+            }
+
+            var requestBody = await request.Content.ReadAsStringAsync(cancellationToken);
+            if (!string.IsNullOrEmpty(requestBody))
+            {
+                Console.WriteLine("請求內容:");
+                Console.WriteLine(requestBody);
+            }
+        }
+
+        // 發送請求
+        var response = await base.SendAsync(request, cancellationToken);
+
+        var duration = DateTime.UtcNow - startTime;
+
+        // 記錄回應
+        Console.WriteLine("\n===== HTTP 回應 =====");
+        Console.WriteLine($"狀態: {(int)response.StatusCode} {response.StatusCode}");
+        Console.WriteLine("標頭:");
+        foreach (var header in response.Headers)
+        {
+            Console.WriteLine($"  {header.Key}: {string.Join(", ", header.Value)}");
+        }
+
+        if (response.Content != null)
+        {
+            foreach (var header in response.Content.Headers)
+            {
+                Console.WriteLine($"  {header.Key}: {string.Join(", ", header.Value)}");
+            }
+
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            if (!string.IsNullOrEmpty(responseBody))
+            {
+                Console.WriteLine("回應內容:");
+                Console.WriteLine(responseBody);
+            }
+        }
+
+        Console.WriteLine($"耗時: {duration.TotalMilliseconds:F2} ms");
+        Console.WriteLine("".PadRight(50, '='));
+
+        return response;
+    }
+}
 
 internal class Program
 {
@@ -15,14 +84,19 @@ internal class Program
         string GivenName = "Vulcan20250814111";
         string FamilynName = "Lee";
 
-         var settings = new FhirClientSettings
+        var settings = new FhirClientSettings
         {
             PreferredFormat = ResourceFormat.Json,
             PreferredReturn = Prefer.ReturnRepresentation,
             Timeout = 60_000
         };
 
-        var client = new FhirClient(FhirBaseUrl, settings);
+        // 建立 HTTP 客戶端並加入記錄 Handler
+        var httpHandler = new HttpClientHandler();
+        var loggingHandler = new HttpLoggingHandler { InnerHandler = httpHandler };
+        var httpClient = new HttpClient(loggingHandler);
+
+        var client = new FhirClient(FhirBaseUrl, httpClient, settings);
 
         try
         {
@@ -69,7 +143,7 @@ internal class Program
             // 以 family name 搜尋，或用 identifier 精準搜尋
             Console.WriteLine($@"Searching Patient by family name '{FamilynName}' ...");
             //var bundle = await client.SearchAsync<Patient>(new string[] { $"family={FamilynName}", "_count=5" }); // GET /Patient?family=Doe&_count=5
-            var bundle = await client.SearchAsync<Patient>(new string[] 
+            var bundle = await client.SearchAsync<Patient>(new string[]
             { $"family=Sharma" }); // GET /Patient?family=Doe&_count=5
             Console.WriteLine($"Search total (if provided): {bundle.Total}");
             foreach (var entry in bundle.Entry ?? Enumerable.Empty<Bundle.EntryComponent>())

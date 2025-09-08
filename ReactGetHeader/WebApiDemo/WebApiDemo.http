@@ -1,0 +1,12 @@
+@WebApiDemo_HostAddress = https://localhost:7074
+
+GET {{WebApiDemo_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{WebApiDemo_HostAddress}}/weatherforecast/GetWeatherForecastWithHeaders
+Location: Kaohsiung
+StartDate: 2025/09/01
+
+###

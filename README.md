@@ -19,7 +19,8 @@
 |reactGet|React API 01 : 呼叫一個 Get 方法 API，並將結果渲染到網頁上||
 |reactGetQueryString|React API 02 : 呼叫一個 Get 方法 API，取得查詢字串內容並將結果渲染到網頁上||
 |reactGetRoutingValue|React API 03 : 呼叫一個 Get 方法 API，取得路由內容並將結果渲染到網頁上||
-||||
+|ReactGetHeader|React API 04 : 呼叫一個 Get 方法 API，傳送與取得 Header 的數值||
+|ReactGetCookie|React API 04 : 呼叫一個 Get 方法 API，傳送與取得 Cookie 的數值||
 ||||
 ||||
 ||||

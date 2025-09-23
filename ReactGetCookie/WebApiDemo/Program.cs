@@ -20,7 +20,8 @@ namespace WebApiDemo
                 {
                     policy.WithOrigins("http://localhost:49158") // React 應用運行在此端口
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowCredentials();
                 });
             });
             #endregion

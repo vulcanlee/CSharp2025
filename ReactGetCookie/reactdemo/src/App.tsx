@@ -1,39 +1,76 @@
-﻿import { useState } from 'react'
+﻿import { useMemo, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
 // 定義 WeatherForecast 型別，對應後端的資料結構
 interface WeatherForecast {
-    date: string;
-    temperatureC: number;
-    temperatureF: number;
-    summary: string;
+    Date: string;
+    TemperatureC: number;
+    TemperatureF: number;
+    Summary: string;
+}
+
+// 簡易 Cookie 解析
+function parseCookies(): Record<string, string> {
+    return Object.fromEntries(
+        document.cookie.split('; ').filter(Boolean).map(kv => {
+            const idx = kv.indexOf('=')
+            const k = kv.substring(0, idx)
+            const v = kv.substring(idx + 1)
+            return [k, v]
+        })
+    )
 }
 
 function App() {
-    const [count, setCount] = useState(0)
+    const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
+    const [date, setDate] = useState<string>(today)
+    const [location, setLocation] = useState<string>('Taipei')
+
     const [forecasts, setForecasts] = useState<WeatherForecast[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
-    // 獲取天氣預報資料的函數
-    const fetchWeatherForecast = async () => {
+    // 1) 以 Cookie 寫入日期與地點 (SameSite=None; Secure; Path=/; Max-Age=600)
+    // 2) 呼叫 API 讓後端根據 Cookie 產生天氣預報並以 Cookie 回傳
+    // 3) 從 Cookie 讀取 forecast_data，解析後渲染
+    const sendCriteriaViaCookiesAndFetch = async () => {
         setLoading(true)
         setError('')
+        setForecasts([])
 
         try {
-            const response = await fetch('https://localhost:7074/weatherforecast')
+            // 需在 HTTPS 下才能設定 Secure Cookie
+            const maxAge = 600
+            document.cookie = `forecast_date=${encodeURIComponent(date)}; Path=/; Max-Age=${maxAge}; SameSite=None; Secure`
+            document.cookie = `forecast_location=${encodeURIComponent(location)}; Path=/; Max-Age=${maxAge}; SameSite=None; Secure`
 
-            if (!response.ok) {
-                throw new Error(`API 請求失敗: ${response.status}`)
+            // 呼叫後端觸發 Set-Cookie 寫入 forecast_data
+            const api = 'https://localhost:7074/WeatherForecast/CookieForecast'
+            const resp = await fetch(api, {
+                method: 'GET',
+                credentials: 'include' // 關鍵：允許帶/收 Cookie
+            })
+
+            if (!resp.ok && resp.status !== 204) {
+                throw new Error(`API 失敗: ${resp.status}`)
             }
 
-            const data = await response.json()
+            // 從 Cookie 取回預報
+            const cookies = parseCookies()
+            const json = cookies['forecast_data']
+            if (!json) {
+                throw new Error('未取得 forecast_data Cookie')
+            }
+
+            const foo = decodeURIComponent(json)
+            const bar = JSON.parse(foo)
+            const data: WeatherForecast[] = JSON.parse(decodeURIComponent(json))
             setForecasts(data)
         } catch (err) {
-            setError(err instanceof Error ? err.message : '獲取天氣預報時發生錯誤')
-            console.error('獲取天氣預報時發生錯誤:', err)
+            setError(err instanceof Error ? err.message : '取得天氣預報時發生錯誤')
+            console.error(err)
         } finally {
             setLoading(false)
         }
@@ -50,23 +87,30 @@ function App() {
                 </a>
             </div>
             <h1>Vite + React</h1>
-            <div className="card">
-                <button onClick={() => setCount((count) => count + 1)}>
-                    count is {count}
-                </button>
-                <p>
-                    Edit <code>src/App.tsx</code> and save to test HMR
-                </p>
+
+            {/* 條件輸入區 */}
+            <div className="card" style={{ marginTop: '20px' }}>
+                <h2>設定條件（以 Cookie 傳遞）</h2>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <label>
+                        日期：
+                        <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+                    </label>
+                    <label>
+                        地點：
+                        <input type="text" value={location} onChange={e => setLocation(e.target.value)} placeholder="Taipei" />
+                    </label>
+                    <button onClick={sendCriteriaViaCookiesAndFetch} disabled={loading}>
+                        {loading ? '提交中…' : '以 Cookie 傳送並取得預報'}
+                    </button>
+                </div>
+
+                {error && <p style={{ color: 'red' }}>{error}</p>}
             </div>
 
             {/* 天氣預報區塊 */}
             <div className="card" style={{ marginTop: '20px' }}>
                 <h2>天氣預報</h2>
-                <button onClick={fetchWeatherForecast} disabled={loading}>
-                    {loading ? '獲取中...' : '獲取天氣預報'}
-                </button>
-
-                {error && <p style={{ color: 'red' }}>{error}</p>}
 
                 {forecasts.length > 0 && (
                     <div style={{ marginTop: '20px' }}>
@@ -82,10 +126,10 @@ function App() {
                             <tbody>
                                 {forecasts.map((forecast, index) => (
                                     <tr key={index}>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{forecast.date}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{forecast.temperatureC}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{forecast.temperatureF}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{forecast.summary}</td>
+                                        <td style={{ border: '1px solid #ddd,', padding: '8px' }}>{forecast.Date}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{forecast.TemperatureC}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{forecast.TemperatureF}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{forecast.Summary}</td>
                                     </tr>
                                 ))}
                             </tbody>

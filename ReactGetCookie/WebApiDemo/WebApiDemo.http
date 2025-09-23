@@ -1,6 +1,20 @@
-@WebApiDemo_HostAddress = http://localhost:5281
+# Pseudocode:
+# - Define two variables to hold cookie values: City and Date (format yyyy-MM-dd).
+# - For the CookieForecast request, add a Cookie header: "Cookie: city={{City}}; date={{Date}}".
+# - Preserve existing requests; only augment the CookieForecast request with headers.
+# - Users can change @City and @Date at the top; the request will pick them up dynamically.
+
+@WebApiDemo_HostAddress = https://localhost:7074
+@City = Taipei
+@Date = 2025-09-23
 
 GET {{WebApiDemo_HostAddress}}/weatherforecast/
 Accept: application/json
+
+###
+
+GET {{WebApiDemo_HostAddress}}/weatherforecast/CookieForecast
+Accept: application/json
+Cookie: city={{City}}; date={{Date}}
 
 ###

@@ -15,13 +15,13 @@
 |csBlazorRoutingParameter|Blazor 跳轉 1 : 動態路由參數，傳遞與接收路由參數||
 |csBlazorQueryString|Blazor 跳轉 2 : 導航切換頁面時候，透過查詢字串，傳遞與接收查詢參數||
 |csPatientCRUD|病人資料 CRUD 操作範例||
-|ReactWebApi|前端使用 React，後端使用 ASP.NET Core 的測試標準專案||
-|reactGet|React API 01 : 呼叫一個 Get 方法 API，並將結果渲染到網頁上||
-|reactGetQueryString|React API 02 : 呼叫一個 Get 方法 API，取得查詢字串內容並將結果渲染到網頁上||
-|reactGetRoutingValue|React API 03 : 呼叫一個 Get 方法 API，取得路由內容並將結果渲染到網頁上||
-|ReactGetHeader|React API 04 : 呼叫一個 Get 方法 API，傳送與取得 Header 的數值||
-|ReactGetCookie|React API 04 : 呼叫一個 Get 方法 API，傳送與取得 Cookie 的數值||
-||||
+|ReactWebApi|React API 01 : 前端使用 React，後端使用 ASP.NET Core 的測試標準專案||
+|reactGet|React API 02 : 呼叫一個 Get 方法 API，並將結果渲染到網頁上||
+|reactGetQueryString|React API 03 : 呼叫一個 Get 方法 API，取得查詢字串內容並將結果渲染到網頁上||
+|reactGetRoutingValue|React API 04 : 呼叫一個 Get 方法 API，取得路由內容並將結果渲染到網頁上||
+|ReactGetHeader|React API 05 : 呼叫一個 Get 方法 API，傳送與取得 Header 的數值||
+|ReactGetCookie|React API 06 : 呼叫一個 Get 方法 API，傳送與取得 Cookie 的數值||
+|ReactPostJson|React API 07 : 呼叫一個 Post 方法 API，傳送 JSON 資料並取得回應||
 ||||
 ||||
 ||||

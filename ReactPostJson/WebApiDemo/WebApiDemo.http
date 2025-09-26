@@ -1,0 +1,13 @@
+@WebApiDemo_HostAddress = https://localhost:7074
+
+GET {{WebApiDemo_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+POST {{WebApiDemo_HostAddress}}/weatherforecast
+Content-Type: application/json
+
+{"location":"¥x¥_","requestTime":"2025-09-26T10:48"}
+
+###

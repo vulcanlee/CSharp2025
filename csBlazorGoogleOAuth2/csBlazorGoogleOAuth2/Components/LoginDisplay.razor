@@ -1,0 +1,17 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Nav
+
+@{
+	var returnUrl = Nav.ToBaseRelativePath(Nav.Uri);
+}
+<AuthorizeView>
+    <Authorized>
+        <span class="me-2">Hi, @context.User.Identity?.Name</span>
+        <form method="post" action="/logout" class="d-inline">
+            <button type="submit" class="btn btn-sm btn-outline-secondary">登出</button>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+        <a class="btn btn-sm btn-primary" href="/login?returnUrl=@Nav.ToBaseRelativePath(Nav.Uri)">使用 Google 登入</a>
+    </NotAuthorized>
+</AuthorizeView>

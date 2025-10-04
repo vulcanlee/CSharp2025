@@ -22,7 +22,7 @@
 |ReactGetHeader|React API 05 : 呼叫一個 Get 方法 API，傳送與取得 Header 的數值||
 |ReactGetCookie|React API 06 : 呼叫一個 Get 方法 API，傳送與取得 Cookie 的數值||
 |ReactPostJson|React API 07 : 呼叫一個 Post 方法 API，傳送 JSON 資料並取得回應||
-||||
+|csBlazorGoogleOAuth2|Blazor 使用 Google OAuth 2.0||
 ||||
 ||||
 ||||

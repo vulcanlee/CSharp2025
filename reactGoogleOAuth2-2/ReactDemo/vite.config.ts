@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+ï»¿import { defineConfig } from 'vite';
 import plugin from '@vitejs/plugin-react';
 import fs from 'fs'
 import path from 'path'
@@ -7,7 +7,7 @@ import path from 'path'
 export default defineConfig({
     plugins: [plugin()],
     server: {
-        host: true,       // Åı¥~³¡/§½°ìºô¤]¯à³s(¥i¿ï)
+        host: true,  // å…è®¸ä½¿ç”¨IPåœ°å€è®¿é—®
         port: 49158,
         https: {
             key: fs.readFileSync(path.resolve('localhost-key.pem')),

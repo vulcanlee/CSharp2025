@@ -1,5 +1,4 @@
-﻿// src/App.tsx
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 
 const API = 'https://localhost:7074';
 
@@ -79,7 +78,7 @@ function App() {
         // 儲存當前頁面狀態(如果需要)
         sessionStorage.setItem('preLoginPath', window.location.pathname);
         // 導向後端 /login 端點，觸發 Google OAuth2 流程
-        window.location.href = `${API}/login`;
+        window.location.href = `${API}/do-login`;
     };
 
     // 登出

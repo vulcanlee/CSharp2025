@@ -30,7 +30,7 @@ public class Program
         {
             options.AddPolicy("AllowReactApp", policy =>
             {
-                policy.WithOrigins("http://localhost:49158") // React 應用運行在此端口
+                policy.WithOrigins("https://localhost:49158") // React 應用運行在此端口
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
@@ -79,6 +79,8 @@ public class Program
                 options.ClientSecret = configService.ClientSecret;
                 options.CallbackPath = "/signin-google"; // 要和 Google 控制台一致
                 options.SaveTokens = true;               // 如需後續調用 Google API 可保留
+                                                         // 2) 使用 Code Flow + PKCE
+                options.UsePkce = true;
             });
 
         builder.Services.AddAuthorization();
@@ -108,7 +110,7 @@ public class Program
         app.MapGet("/do-login", async ctx =>
         {
             // 登入完成後回到前端首頁
-            var defaultReturn = "http://localhost:49158/"; // 未帶 returnUrl 時的預設回跳
+            var defaultReturn = "https://localhost:49158/"; // 未帶 returnUrl 時的預設回跳
             var props = new Microsoft.AspNetCore.Authentication.AuthenticationProperties
             {
                 RedirectUri = "/login"
@@ -119,7 +121,7 @@ public class Program
             //var qsReturn = ctx.Request.Query["returnUrl"].ToString();
             //// 允許回跳的前端來源（避免 Open Redirect）
             //var allowedFrontends = new[] { "http://localhost:49158", "https://localhost:49158" };
-            //var defaultReturn = "http://localhost:49158/"; // 未帶 returnUrl 時的預設回跳
+            //var defaultReturn = "https://localhost:49158/"; // 未帶 returnUrl 時的預設回跳
 
             //string redirect = defaultReturn;
             //if (!string.IsNullOrWhiteSpace(qsReturn) &&
@@ -172,7 +174,7 @@ public class Program
             var qsReturn = ctx.Request.Query["returnUrl"].ToString();
             // 允許回跳的前端來源（避免 Open Redirect）
             var allowedFrontends = new[] { "http://localhost:49158", "https://localhost:49158" };
-            var defaultReturn = "http://localhost:49158/"; // 未帶 returnUrl 時的預設回跳
+            var defaultReturn = "https://localhost:49158/"; // 未帶 returnUrl 時的預設回跳
 
             string redirect = defaultReturn;
             if (!string.IsNullOrWhiteSpace(qsReturn) &&

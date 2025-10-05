@@ -161,13 +161,13 @@ public class Program
             var refreshToken = authResult.Properties?.GetTokenValue("refresh_token");
             var expiresAt = authResult.Properties?.GetTokenValue("expires_at");
 
-            // 登入完成後回到前端首頁
-            var returnUrl = ctx.Request.Query["returnUrl"].ToString();
-            var props = new Microsoft.AspNetCore.Authentication.AuthenticationProperties
-            {
-                RedirectUri = "/"
-            };
-            await ctx.ChallengeAsync(GoogleDefaults.AuthenticationScheme, props);
+            // 
+            //var returnUrl = ctx.Request.Query["returnUrl"].ToString();
+            //var props = new Microsoft.AspNetCore.Authentication.AuthenticationProperties
+            //{
+            //    RedirectUri = "/"
+            //};
+            //await ctx.ChallengeAsync(GoogleDefaults.AuthenticationScheme, props);
 
 
             //var qsReturn = ctx.Request.Query["returnUrl"].ToString();

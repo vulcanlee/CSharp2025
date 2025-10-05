@@ -39,8 +39,8 @@ namespace csBlazorGoogleOAuth2
             })
             .AddGoogle(options =>
             {
-                options.ClientId = configService.Id;
-                options.ClientSecret = configService.PW;
+                options.ClientId = configService.ClientId;
+                options.ClientSecret = configService.ClientSecret;
                 // 預設 CallbackPath = /signin-google，可不設
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");

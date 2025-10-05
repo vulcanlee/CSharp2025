@@ -51,6 +51,7 @@ namespace csBlazorGoogleOAuth2
                 options.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "given_name");
                 options.ClaimActions.MapJsonKey(ClaimTypes.Surname, "family_name");
                 options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
+
             });
 
             builder.Services.AddAuthorization();
@@ -84,10 +85,25 @@ namespace csBlazorGoogleOAuth2
             app.MapGet("/login", async context =>
             {
                 // 觸發外部登入挑戰，登入成功後導回原頁或首頁
+                //var returnUrl = context.Request.Query["returnUrl"].ToString();
+                //if (string.IsNullOrEmpty(returnUrl)) returnUrl = "/";
+                //var props = new AuthenticationProperties { RedirectUri = returnUrl };
+                //await context.ChallengeAsync(GoogleDefaults.AuthenticationScheme, props);
+
                 var returnUrl = context.Request.Query["returnUrl"].ToString();
                 if (string.IsNullOrEmpty(returnUrl)) returnUrl = "/";
-                var props = new AuthenticationProperties { RedirectUri = returnUrl };
+
+                var props = new AuthenticationProperties
+                {
+                    RedirectUri = returnUrl,
+                    Items =
+                    {
+                        { "prompt", "select_account" } // 強制顯示帳號選擇畫面
+                    }
+                };
+
                 await context.ChallengeAsync(GoogleDefaults.AuthenticationScheme, props);
+
             });
 
             app.MapPost("/logout", async context =>

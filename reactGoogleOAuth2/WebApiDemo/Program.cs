@@ -156,6 +156,10 @@ public class Program
                                     c.Type.EndsWith("/emailaddress", StringComparison.OrdinalIgnoreCase))?.Value
                              ?? "";
 
+            // 已登入：此時 SaveTokens = true 才會把 Token 存到 Cookie 內的 AuthenticationProperties
+            var accessToken = authResult.Properties?.GetTokenValue("access_token");
+            var refreshToken = authResult.Properties?.GetTokenValue("refresh_token");
+            var expiresAt = authResult.Properties?.GetTokenValue("expires_at");
 
             // 登入完成後回到前端首頁
             var returnUrl = ctx.Request.Query["returnUrl"].ToString();

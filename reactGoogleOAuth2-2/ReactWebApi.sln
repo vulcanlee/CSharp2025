@@ -1,9 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36401.2
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11018.127 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiDemo", "WebApiDemo\WebApiDemo.csproj", "{46510BC9-DFF4-4810-9622-B07E3D02CD97}"
+	ProjectSection(ProjectDependencies) = postProject
+		{17BDE256-5760-9F89-7D8C-26886E2D72BE} = {17BDE256-5760-9F89-7D8C-26886E2D72BE}
+	EndProjectSection
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "reactdemo", "ReactDemo\reactdemo.esproj", "{17BDE256-5760-9F89-7D8C-26886E2D72BE}"
 EndProject

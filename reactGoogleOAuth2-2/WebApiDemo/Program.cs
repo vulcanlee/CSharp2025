@@ -81,6 +81,10 @@ public class Program
                 options.SaveTokens = true;               // 如需後續調用 Google API 可保留
                                                          // 2) 使用 Code Flow + PKCE
                 options.UsePkce = true;
+
+                // 關鍵：加入 Google 的 prompt 參數
+                // 想每次強制輸入密碼：login；想一定出帳號選單：select_account
+                options.AdditionalAuthorizationParameters["prompt"] = "login";
             });
 
         builder.Services.AddAuthorization();

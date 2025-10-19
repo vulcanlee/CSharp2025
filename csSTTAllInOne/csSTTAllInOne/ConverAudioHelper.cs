@@ -12,7 +12,7 @@ namespace csSTTAllInOne
         List<string> AcceptConvertFiles = new()
         {
             // 聲音格式
-            ".mp3", ".aac", ".ogg", ".wma", ".m4a", ".flac", ".ape", ".aiff",
+            ".mp3", ".aac", ".ogg", ".wma", ".m4a", ".flac", ".ape", ".aiff", ".wav",
             
             // 影片格式
             ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm", ".3gp",

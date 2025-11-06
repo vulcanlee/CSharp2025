@@ -1,0 +1,22 @@
+﻿:root {
+    --color-primary: #00acc1;
+    --color-success: #26c6da;
+    --color-warning: #ffd54f;
+    --color-error: #e57373;
+    --color-info: #00acc1;
+    --color-text-base: #000000;
+    --color-bg-base: #ffffff;
+    --font-size: 14px;
+    --border-radius: 6px;
+}
+
+/* 覆盖 Ant Design 的 CSS 变量 */
+.ant-btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.ant-checkbox-inner,
+.ant-radio-inner {
+    border-radius: var(--border-radius);
+}

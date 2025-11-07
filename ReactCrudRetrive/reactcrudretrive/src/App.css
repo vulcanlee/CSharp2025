@@ -1,0 +1,89 @@
+#root {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1f2933;
+  background-color: #f9fafb;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.app__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.app__title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.app__subtitle {
+  margin: 0;
+  color: #52606d;
+}
+
+.app__status {
+  margin: 0;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.app__status--error {
+  color: #b91c1c;
+}
+
+.app__table-wrapper {
+  overflow-x: auto;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 30px -15px rgba(15, 23, 42, 0.45);
+}
+
+.app__table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.app__table thead {
+  background-color: #f3f4f6;
+}
+
+.app__table th,
+.app__table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.app__table th {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #374151;
+}
+
+.app__table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.app__project-name {
+  display: block;
+  font-weight: 600;
+}
+
+.app__project-description {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: #4b5563;
+}

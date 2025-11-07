@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ReactCrudRetrive/reactcrudretrive.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>

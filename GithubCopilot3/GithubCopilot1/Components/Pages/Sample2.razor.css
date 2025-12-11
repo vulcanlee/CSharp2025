@@ -177,3 +177,29 @@
         order: -1;
     }
 }
+
+.clinical-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.tab-button {
+    min-width: 130px;
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* 各頁籤顏色，可依 PPT 微調 */
+.tab-clinical      { background-color: #00b050; }
+.tab-image         { background-color: #7030a0; }
+.tab-blood         { background-color: #0070c0; }
+.tab-ctcae         { background-color: #00b050; }
+.tab-questionnaire { background-color: #0070c0; }
+.tab-followup      { background-color: #7030a0; }

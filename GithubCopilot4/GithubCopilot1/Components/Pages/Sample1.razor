@@ -1,0 +1,312 @@
+﻿@page "/Sample1"
+
+    <style>
+        body {
+          background: #ececec;
+          margin: 0;
+          font-family: "Segoe UI", Arial, "Microsoft JhengHei", "微軟正黑體", sans-serif;
+        }
+        .container {
+          margin: 20px auto;
+          padding: 24px;
+          background: #fff;
+          border-radius: 10px;
+          max-width: 1150px;
+          box-shadow: 0 0 10px #bbb;
+        }
+        .title {
+          font-size: 2em;
+          font-weight: 600;
+          letter-spacing: 2px;
+          margin-bottom: 18px;
+        }
+        .title span {
+          font-weight: 900;
+          font-size: 1.2em;
+          letter-spacing: 4px;
+        }
+        .flex-row {
+          display: flex;
+          gap: 16px;
+        }
+        .section {
+          border: 2px solid #d2d2d2;
+          border-radius: 8px;
+          padding: 10px 12px 16px 12px;
+          background: #f6f8fa;
+          flex: 1;
+          min-width: 340px;
+          margin-bottom: 16px;
+        }
+        .subject-no {
+          background: #fff;
+          border: 2px solid #d2d2d2;
+          border-radius: 8px;
+          margin-bottom: 8px;
+          padding: 6px 12px;
+          font-size: 1.15em;
+          font-weight: 600;
+          color: #1a1a1a;
+          letter-spacing: 1px;
+        }
+        .subject-no .highlight {
+          color: #e6001f;
+          font-weight: 900;
+          margin-left: 10px;
+          letter-spacing: 2px;
+        }
+        .sub-label {
+          font-size: 0.95em;
+          color: #428bca;
+          font-weight: 400;
+          margin-left: 7px;
+          letter-spacing: 1px;
+        }
+        .table-block {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 6px;
+        }
+        .table-block th,
+        .table-block td {
+          border: 1px solid #bbb;
+          padding: 6px 8px;
+          font-size: 1em;
+          text-align: left;
+          background: #fff;
+        }
+        .table-block th {
+          background: #ececec;
+          font-weight: 700;
+        }
+        .table-block .sub-field {
+          color: #9e005d;
+          font-weight: 600;
+          font-size: 0.92em;
+        }
+        .table-block .calculation {
+          color: #6a7287;
+          font-size: 0.90em;
+          font-style: italic;
+        }
+        .section-header {
+          font-size: 1.12em;
+          font-weight: 700;
+          letter-spacing: 1px;
+          margin-bottom: 6px;
+          background: #fff3e0;
+          padding: 4px 8px;
+          border-radius: 4px;
+        }
+        .ct-section {
+          flex: 0 0 350px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          background: #fff;
+          border: 2px solid #c876da;
+          border-radius: 10px;
+          padding: 0 0 18px 0;
+          margin-left: 10px;
+          min-width: 330px;
+          max-width: 370px;
+          margin-bottom: 16px;
+        }
+        .ct-title {
+          background: linear-gradient(90deg, #b30086 0%, #b300b3 100%);
+          color: #fff;
+          font-size: 2em;
+          font-weight: 700;
+          text-align: center;
+          padding: 12px 0;
+          width: 100%;
+          border-radius: 8px 8px 0 0;
+          letter-spacing: 1.5px;
+          margin-bottom: 0;
+        }
+        .ct-image {
+          width: 92%;
+          margin: 20px 0 16px 0;
+          border-radius: 6px;
+          background: #111;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 190px;
+          position: relative;
+          overflow: hidden;
+        }
+        .ct-image img {
+          width: 100%;
+          border-radius: 6px;
+          object-fit: contain;
+          background: #222;
+        }
+        .ct-image .l3-label {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -20%);
+          color: #e386e5;
+          font-size: 2.1em;
+          font-weight: 700;
+          letter-spacing: 2px;
+          pointer-events: none;
+          text-shadow: 0 0 10px #fff, 0 0 12px #c44;
+        }
+        .ct-report {
+          width: 94%;
+          margin: 0 auto;
+          border: 2px solid #b300b3;
+          border-radius: 0 0 8px 8px;
+          background: #fff;
+          font-size: 1.5em;
+          text-align: center;
+          color: #1a1a1a;
+          padding: 8px 0;
+          font-weight: 600;
+          margin-top: 6px;
+          margin-bottom: 0;
+        }
+        /* 底部按鈕列 */
+        .footer-buttons {
+          margin-top: 18px;
+          display: flex;
+          gap: 16px;
+          justify-content: center;
+        }
+        .footer-buttons .btn {
+          padding: 16px 32px;
+          font-size: 1.12em;
+          border-radius: 18px;
+          border: none;
+          font-weight: bold;
+          color: #fff;
+          cursor: pointer;
+          min-width: 130px;
+          box-shadow: 0 2px 6px #aaa;
+          letter-spacing: 2px;
+          transition: background 0.15s;
+        }
+        .btn-clinic { background: #2ecc71; }
+        .btn-img    { background: #b55ca6; }
+        .btn-blood  { background: #26a5dd; }
+        .btn-ctcae  { background: #69c830; }
+        .btn-ctcae strong { font-weight: 900; letter-spacing: 1.5px; }
+        .btn-form   { background: #268dce; }
+        .btn-follow { background: #94259b; }
+        .footer-buttons .btn:hover { filter: brightness(0.95); }
+    </style>
+  
+    <div class="container">
+        <div class="title">
+            Basic clinical presentation <span>臨床資訊</span>
+        </div>
+        <div class="flex-row">
+            <!-- 左側：臨床資料 -->
+            <div class="section" style="flex:1.1;">
+                <div class="subject-no">
+                    病人編號 Subject No
+                    <span class="highlight">NCKUH-E001</span>
+                    <span class="sub-label">(E代表內膜癌, O代表卵巢癌)</span>
+                </div>
+                <table class="table-block">
+                    <tr>
+                        <th style="width:120px;">臨床資訊, 癌別<br>EC or OC(自填)</th>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>年齡 (Age)</th>
+                        <td class="sub-field">數值型<br>20歲~80歲</td>
+                    </tr>
+                    <tr>
+                        <th>月經狀態</th>
+                        <td class="sub-field">數值型<br>0停經、1未停經</td>
+                    </tr>
+                    <tr>
+                        <th>身高(Height) cm</th>
+                        <td class="sub-field">數值型<br>140cm~180cm</td>
+                    </tr>
+                    <tr>
+                        <th>體重(BW) Kg</th>
+                        <td class="sub-field">數值型<br>30kg~120kg</td>
+                    </tr>
+                    <tr>
+                        <th>BMI (Kg/m²)</th>
+                        <td class="calculation">
+                            計算公式說明如下：<br>
+                            體重(公斤) ÷ 身高(公尺) ÷ 身高(公尺)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>體表面積(BSA) m²</th>
+                        <td class="calculation">
+                            計算公式說明如下：<br>
+                            體重(公斤) x 身高(公分) ÷ 3600，開根號
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>腰圍(AC) cm</th>
+                        <td class="sub-field">自填</td>
+                    </tr>
+                    <tr>
+                        <th>日常體能狀態(PS)</th>
+                        <td class="sub-field">數值型<br>0, 1, 2</td>
+                    </tr>
+                </table>
+            </div>
+            <!-- 中間：癌症狀態 -->
+            <div class="section" style="flex:0.9;">
+                <div class="section-header">癌症狀態 癌別 卵巢/子宮</div>
+                <table class="table-block">
+                    <tr>
+                        <th style="width:180px;">癌症分期(2023 FIGO)</th>
+                        <td class="sub-field">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>AJCC c stage</th>
+                        <td class="sub-field">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>AJCC p stage</th>
+                        <td class="sub-field">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>組織型態</th>
+                        <td class="sub-field">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>MMR protein</th>
+                        <td class="sub-field">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>p53</th>
+                        <td class="sub-field">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>Hormon status</th>
+                        <td class="sub-field">拉選式</td>
+                    </tr>
+                </table>
+            </div>
+            <!-- 右側：CT 影像區 -->
+            <div class="ct-section">
+                <div class="ct-title">CT Image</div>
+                <div class="ct-image">
+                    <!-- 替換成你自己的 CT 影像路徑 -->
+                    <img src="https://cdn.openai.com/chatgpt/image_example_l3_ct.png" alt="CT L3" />
+                    <div class="l3-label">L3</div>
+                </div>
+                <div class="ct-report">Report</div>
+            </div>
+        </div>
+        <!-- 底部按鈕列 -->
+        <div class="footer-buttons">
+            <button class="btn btn-clinic">臨床資料</button>
+            <button class="btn btn-img">影像資料</button>
+            <button class="btn btn-blood">抽血資料</button>
+            <button class="btn btn-ctcae"><strong>CTCAE 5.0</strong></button>
+            <button class="btn btn-form">問卷</button>
+            <button class="btn btn-follow">追蹤資料</button>
+        </div>
+    </div>

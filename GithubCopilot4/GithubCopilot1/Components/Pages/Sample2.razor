@@ -1,0 +1,148 @@
+﻿@page "/Sample2"
+
+<div class="clinical-page">
+    <h1 class="page-title">
+        Basic clinical presentation <span class="title-zh">臨床資訊</span>
+    </h1>
+
+    <div class="clinical-layout">
+        <!-- 左邊：病人基本資料 -->
+        <section class="panel panel-patient">
+            <header class="panel-header">
+                <span>病人編號 Subject No</span>
+                <span class="subject-no">NCKUH-E001</span>
+                <span class="subject-note">(E 代表內膜癌，O 代表卵巢癌)</span>
+            </header>
+
+            <table class="info-table">
+                <tbody>
+                    <tr>
+                        <th>臨床資訊, 癌別<br />EC or OC(自填)</th>
+                        <td class="value-text">數值型</td>
+                    </tr>
+                    <tr>
+                        <th>年齡 (Age)</th>
+                        <td class="value-text">
+                            數值型<br />
+                            <span class="hint">20歲~80歲</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>月經狀態</th>
+                        <td class="value-text">
+                            數值型<br />
+                            <span class="hint">0 停經，1 未停經</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>身高 (Height) cm</th>
+                        <td class="value-text">
+                            數值型<br />
+                            <span class="hint">140cm~180cm</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>體重 (BW) Kg</th>
+                        <td class="value-text">
+                            數值型<br />
+                            <span class="hint">30kg~120kg</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>BMI (Kg/m²)</th>
+                        <td class="value-text">
+                            計算公式說明如下：<br />
+                            體重(公斤) ÷ 身高(公尺) ÷ 身高(公尺)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>體表面積 (BSA) m²</th>
+                        <td class="value-text">
+                            計算公式說明如下：<br />
+                            體重(公斤) × 身高(公分) ÷ 3600，開根號
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>腰圍 (AC) cm</th>
+                        <td class="value-text">自填</td>
+                    </tr>
+                    <tr>
+                        <th>日常機能狀態</th>
+                        <td class="value-text">數值型</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 中間：癌症狀態 -->
+        <section class="panel panel-cancer">
+            <header class="panel-header panel-header-highlight">
+                癌症狀態 癌別 卵巢/子宮
+            </header>
+
+            <table class="info-table">
+                <tbody>
+                    <tr>
+                        <th>癌症分期 (2023 FIGO)</th>
+                        <td class="link-like">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>AJCC c stage</th>
+                        <td class="link-like">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>AJCC p stage</th>
+                        <td class="link-like">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>組織型態</th>
+                        <td class="link-like">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>MMR protein</th>
+                        <td class="link-like">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>p53</th>
+                        <td class="link-like">拉選式</td>
+                    </tr>
+                    <tr>
+                        <th>Hormon status</th>
+                        <td class="link-like">拉選式</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 右邊：CT Image -->
+        <section class="panel panel-ct">
+            <header class="ct-header">
+                CT Image
+            </header>
+
+            <div class="ct-content">
+                <div class="ct-image-frame">
+                    <div class="ct-image-placeholder">
+                        <!-- 這裡之後可以換成 <img src="..." /> -->
+                        <span class="ct-level-label">L3</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="report-button">
+                Report
+            </button>
+        </section>
+    </div>
+
+    <!-- 底部頁籤列 -->
+    <nav class="clinical-tabs">
+        <button class="tab-button tab-clinical">臨床資料</button>
+        <button class="tab-button tab-image">影像資料</button>
+        <button class="tab-button tab-blood">抽血資料</button>
+        <button class="tab-button tab-ctcae">CTCAE 5.0</button>
+        <button class="tab-button tab-questionnaire">問卷</button>
+        <button class="tab-button tab-followup">追蹤資料</button>
+    </nav>
+</div>
+

@@ -28,7 +28,8 @@
 |ReactCrudRetrive|React CRUD 之 取得清單||
 |*GithubCopilot1|Github Copilot 1 : 透過ChatGPT將畫面直接產生出 Blazor 頁面||
 |*GithubCopilot2|Github Copilot 2 : 透過Copilot將畫面直接產生出 Blazor 頁面||
-|*GithubCopilot3|Github Copilot 3 : 透過Copilot將畫面直接產生出 Blazor 頁面||
+|*GithubCopilot3|Github Copilot 3 : 使用Copilot進行Blazor頁面畫面的調整||
+|*GithubCopilot4|Github Copilot 4 : 透過Prompt或圖片變更Blazor頁面風格||
 ||||
 ||||
 ||||

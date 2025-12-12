@@ -30,6 +30,7 @@
 |*GithubCopilot2|Github Copilot 2 : 透過Copilot將畫面直接產生出 Blazor 頁面||
 |*GithubCopilot3|Github Copilot 3 : 使用Copilot進行Blazor頁面畫面的調整||
 |*GithubCopilot4|Github Copilot 4 : 透過Prompt或圖片變更Blazor頁面風格||
+|*GithubCopilot5|Github Copilot 5 : 程式碼自動完成輔助||
 ||||
 ||||
 ||||

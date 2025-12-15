@@ -31,6 +31,9 @@
 |*GithubCopilot3|Github Copilot 3 : 使用Copilot進行Blazor頁面畫面的調整||
 |*GithubCopilot4|Github Copilot 4 : 透過Prompt或圖片變更Blazor頁面風格||
 |*GithubCopilot5|Github Copilot 5 : 程式碼自動完成輔助||
+|*GithubCopilot6|Github Copilot 6 : 為程式碼自動加入註解||
+|*GithubCopilot7|Github Copilot 7 : 分析整個專案架構||
+|*GithubCopilot8|Github Copilot 8 : 剖析Web API的程式碼並給出建議||
 ||||
 ||||
 ||||

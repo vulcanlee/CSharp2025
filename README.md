@@ -34,6 +34,7 @@
 |*GithubCopilot6|Github Copilot 6 : 為程式碼自動加入註解||
 |*GithubCopilot7|Github Copilot 7 : 分析整個專案架構||
 |*GithubCopilot8|Github Copilot 8 : 剖析Web API的程式碼並給出建議||
+|*GithubCopilot10|Github Copilot 10 : 自動產生Commit訊息||
 ||||
 ||||
 ||||

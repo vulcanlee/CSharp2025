@@ -1,0 +1,36 @@
+﻿@page "/ExchangeToken"
+@using Hl7.Fhir.Model
+@using SmartApp.Models
+@inject NavigationManager NavigationManager
+
+@if (isReadPatient == false)
+{
+    <h3>請稍後，讀取病患資料</h3>
+}
+else
+{
+    <div>
+        <p>病患名稱</p>
+        <p>@patient.Name[0].ToString()</p>
+        <p>病患名稱</p>
+        <p>@patient.BirthDate.ToString()</p>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "code")]
+    public string? Code { get; set; }
+    [SupplyParameterFromQuery(Name = "state")]
+    public string? State { get; set; }
+
+    bool isReadPatient = false;
+    Patient patient = new();
+
+    override protected async System.Threading.Tasks.Task OnInitializedAsync()
+    {
+        await SetAuthCodeAsync();
+        SmartResponse smartResponse= await GetAccessTokenAsync();
+        await GetPatientAsync(smartResponse);
+    }
+
+}

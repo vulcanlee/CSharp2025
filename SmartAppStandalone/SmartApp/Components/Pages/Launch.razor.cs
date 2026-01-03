@@ -93,12 +93,6 @@ public partial class Launch
 
     public async System.Threading.Tasks.Task<string> GetAuthorizeUrlAsync()
     {
-       //var payload = SimPathHelper.ExtractSimPayload(SmartAppSettingService.Data.FhirServerUrl);
-
-       // //var foo = JwtDecodeHelper.DecodeWithoutValidation(payload);
-
-       // var PatientIdlaunchData = SimPathHelper.GetPatientIdFromSmartHealthItSimSegment(payload);
-
         var state = Guid.NewGuid().ToString("N");
         SmartAppSettingService.Data.State = state;
 

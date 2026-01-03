@@ -10,6 +10,7 @@ namespace SmartApp.Components.Pages;
 
 public partial class ExchangeToken
 {
+    VitalSignsResult heightAndWeight = new VitalSignsResult();
     [Inject]    
     public SmartAppSettingService SmartAppSettingService { get; init; }
     [Inject]
@@ -22,6 +23,7 @@ public partial class ExchangeToken
             await SetAuthCodeAsync();
             SmartResponse smartResponse = await GetAccessTokenAsync();
             await GetPatientAsync(smartResponse);
+            heightAndWeight = await GetHeightAndWeightAsync(smartResponse); 
             StateHasChanged();
         }
     }
@@ -85,7 +87,6 @@ public partial class ExchangeToken
         httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", smartResponse.AccessToken);
 
-        // 2. 用這個 HttpClient 建立 FhirClient
         FhirClientSettings settings = new FhirClientSettings
         {
             PreferredFormat = ResourceFormat.Json
@@ -93,11 +94,93 @@ public partial class ExchangeToken
 
         FhirClient fhirClient = new FhirClient(SmartAppSettingService.Data.FhirServerUrl, httpClient, settings);
 
-        // 3. 讀取 Patient
         patient = await fhirClient.ReadAsync<Patient>($"Patient/{smartResponse.PatientId}");
 
         System.Console.WriteLine($"Read back patient: {patient.Name[0].ToString()}");
 
         isReadPatient = true;
+    }
+
+    private async System.Threading.Tasks.Task<VitalSignsResult> GetHeightAndWeightAsync(SmartResponse smartResponse)
+    {
+        HttpClient httpClient = new HttpClient
+        {
+            BaseAddress = new Uri(SmartAppSettingService.Data.FhirServerUrl)
+        };
+        httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", smartResponse.AccessToken);
+
+        FhirClientSettings settings = new FhirClientSettings
+        {
+            PreferredFormat = ResourceFormat.Json
+        };
+
+        FhirClient fhirClient = new FhirClient(SmartAppSettingService.Data.FhirServerUrl, httpClient, settings);
+
+        // 查詢該病人的 Observation（限制常見 vital-sign codes）
+        SearchParams searchParams = new SearchParams()
+            .Where($"patient={smartResponse.PatientId}")
+            .Where("category=vital-signs")
+            .Include("Observation:patient")
+            .LimitTo(50);
+
+        Bundle bundle = await fhirClient.SearchAsync<Observation>(searchParams);
+
+        decimal? heightValue = null;
+        string? heightUnit = null;
+        decimal? weightValue = null;
+        string? weightUnit = null;
+
+        foreach (Bundle.EntryComponent entry in bundle.Entry)
+        {
+            if (entry.Resource is not Observation obs)
+            {
+                continue;
+            }
+
+            // Observation.code.coding[].code 比對 LOINC
+            string? loincCode = obs.Code?.Coding?.FirstOrDefault()?.Code;
+
+            if (loincCode is null)
+            {
+                continue;
+            }
+
+            Quantity? quantity = obs.Value as Quantity;
+            if (quantity is null)
+            {
+                continue;
+            }
+
+            if (loincCode == "8302-2")
+            {
+                // 身高
+                if (quantity.Value.HasValue)
+                {
+                    heightValue = (decimal)quantity.Value.Value;
+                    heightUnit = quantity.Unit ?? quantity.Code;
+                }
+            }
+            else if (loincCode == "29463-7")
+            {
+                // 體重
+                if (quantity.Value.HasValue)
+                {
+                    weightValue = (decimal)quantity.Value.Value;
+                    weightUnit = quantity.Unit ?? quantity.Code;
+                }
+            }
+        }
+
+        System.Console.WriteLine($"Height: {heightValue} {heightUnit}");
+        System.Console.WriteLine($"Weight: {weightValue} {weightUnit}");
+
+        return new VitalSignsResult
+        {
+            HeightValue = heightValue.ToString(),
+            HeightUnit = heightUnit.ToString(),
+            WeightValue = weightValue.ToString(),
+            WeightUnit = weightUnit.ToString()
+        };
     }
 }

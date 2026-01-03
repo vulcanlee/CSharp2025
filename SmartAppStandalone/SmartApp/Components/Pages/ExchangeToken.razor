@@ -12,8 +12,12 @@ else
     <div>
         <p>病患名稱</p>
         <p>@patient.Name[0].ToString()</p>
-        <p>病患名稱</p>
+        <p>出生日</p>
         <p>@patient.BirthDate.ToString()</p>
+        <p>身高</p>
+        <p>@heightAndWeight.HeightValue <span> @heightAndWeight.HeightUnit</span></p>
+        <p>體重</p>
+        <p>@heightAndWeight.WeightValue <span> @heightAndWeight.WeightUnit</span></p>
     </div>
 }
 

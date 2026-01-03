@@ -19,6 +19,15 @@ else
         <p>體重</p>
         <p>@heightAndWeight.WeightValue <span> @heightAndWeight.WeightUnit</span></p>
     </div>
+    <div>
+        <h3>最近一年醫令清單</h3>
+        <ul>
+            @foreach (var order in OrderItemResult)
+            {
+                <li>@order.OrderCode - @order.OrderDisplay (@order.EncounterStart?.ToString("yyyy-MM-dd"))</li>
+            }
+        </ul>
+    </div>
 }
 
 @code {

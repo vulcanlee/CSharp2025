@@ -102,7 +102,7 @@ public partial class Launch
         string launchUrl = $"{SmartAppSettingService.Data.AuthorizeUrl}?response_type=code" +
             $"&client_id={SmartAppSettingService.Data.ClientId}" +
             $"&redirect_uri={Uri.EscapeDataString(SmartAppSettingService.Data.RedirectUrl)}" +
-            $"&scope={Uri.EscapeDataString("openid fhirUser profile launch/patient patient/*.read")}" +
+            $"&scope={Uri.EscapeDataString("openid fhirUser profile launch/patient patient/*.read patient/Encounter.read patient/MedicationRequest.read patient/ServiceRequest.read")}" +
             $"&state={SmartAppSettingService.Data.State}" +
             $"&launch={SmartAppSettingService.Data.Launch}" +
             $"&aud={Uri.EscapeDataString(SmartAppSettingService.Data.FhirServerUrl)}";

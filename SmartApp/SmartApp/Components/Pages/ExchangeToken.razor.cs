@@ -10,13 +10,32 @@ namespace SmartApp.Components.Pages;
 
 public partial class ExchangeToken
 {
-    [Inject]
+    [Inject]    
     public SmartAppSettingService SmartAppSettingService { get; init; }
+    [Inject]
+    public OAuthStateStoreService OAuthStateStoreService { get; init; }
+
+    protected override async System.Threading.Tasks.Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await SetAuthCodeAsync();
+            SmartResponse smartResponse = await GetAccessTokenAsync();
+            await GetPatientAsync(smartResponse);
+            StateHasChanged();
+        }
+    }
 
     public async System.Threading.Tasks.Task SetAuthCodeAsync()
     {
         await System.Threading.Tasks.Task.Yield();
-        SmartAppSettingService.Data.AuthCode = Code;
+       var SmartAppSettingModelItem =  await OAuthStateStoreService.LoadAsync<SmartAppSettingModel>(State);
+
+        SmartAppSettingModelItem.AuthCode = Code;
+        SmartAppSettingModelItem.State = State;
+
+        SmartAppSettingService.UpdateSetting(SmartAppSettingModelItem);
+        Console.WriteLine($"Retrive state: {SmartAppSettingService.Data.State}");
     }
 
     public async System.Threading.Tasks.Task<SmartResponse> GetAccessTokenAsync()
@@ -26,7 +45,6 @@ public partial class ExchangeToken
                 { "grant_type", "authorization_code" },
                 { "code", SmartAppSettingService.Data.AuthCode },
                 { "redirect_uri", SmartAppSettingService.Data.RedirectUrl },
-                { "scope", "openid fhirUser patient/*.read launch" },  // EHR launch 用 "launch"
                 { "launch", SmartAppSettingService.Data.Launch }
             };
 

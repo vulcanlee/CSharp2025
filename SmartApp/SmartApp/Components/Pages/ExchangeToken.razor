@@ -28,9 +28,6 @@ else
 
     override protected async System.Threading.Tasks.Task OnInitializedAsync()
     {
-        await SetAuthCodeAsync();
-        SmartResponse smartResponse= await GetAccessTokenAsync();
-        await GetPatientAsync(smartResponse);
     }
 
 }

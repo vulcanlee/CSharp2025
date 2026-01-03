@@ -15,6 +15,7 @@ namespace SmartApp
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
+            builder.Services.AddDistributedMemoryCache();
 
             #region 加入設定強型別注入宣告
             builder.Services.Configure<SettingModel>(builder.Configuration
@@ -22,8 +23,9 @@ namespace SmartApp
             #endregion
 
             #region 客製化註冊服務
-            builder.Services.AddSingleton<SettingService>();
-            builder.Services.AddSingleton<SmartAppSettingService>();
+            builder.Services.AddScoped<SettingService>();
+            builder.Services.AddScoped<SmartAppSettingService>();
+            builder.Services.AddScoped<OAuthStateStoreService>(); 
             #endregion
 
             var app = builder.Build();

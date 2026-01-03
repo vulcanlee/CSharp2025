@@ -8,14 +8,4 @@
     [SupplyParameterFromQuery(Name = "launch")]
     public string? LaunchCode { get; set; }
 
-    override protected async Task OnInitializedAsync()
-    {
-        var foo = SmartAppSettingService;
-        KeepLaunchIss();
-        var bar =await GetMetadataAsync();
-        var authUrl = GetAuthorizeUrl();
-
-        NavigationManager.NavigateTo(authUrl);
-    }
-
 }

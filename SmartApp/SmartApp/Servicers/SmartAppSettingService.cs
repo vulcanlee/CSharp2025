@@ -17,4 +17,20 @@ public class SmartAppSettingService
         Data.RedirectUrl = data.RedirectUrl;
         Data.ClientId = data.ClientId;
     }
+
+    public void UpdateSetting(SmartAppSettingModel model)
+    {
+        Data.FhirServerUrl = model.FhirServerUrl;
+        Data.ClientId = model.ClientId;
+        Data.RedirectUrl = model.RedirectUrl;
+        Data.AuthCode = model.AuthCode;
+        Data.ClientState = model.ClientState;
+        Data.TokenUrl = model.TokenUrl;
+        Data.AuthorizeUrl = model.AuthorizeUrl;
+        Data.Iss = model.Iss;
+        Data.Launch = model.Launch;
+        Data.State = model.State;
+
+
+    }
 }

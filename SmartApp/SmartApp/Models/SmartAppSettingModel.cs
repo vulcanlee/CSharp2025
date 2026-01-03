@@ -38,7 +38,11 @@
         /// 用於與外部提供者啟動授權流程的 URL。
         /// </summary>
         public string AuthorizeUrl { get; set; }
+        /// <summary>
+        /// 可用來是否透過 EHR Launch 來啟動授權流程的參數。
+        /// </summary>
         public string Iss { get; set; }
         public string Launch { get; set; }
+        public string State { get; set; }
     }
 }

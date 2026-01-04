@@ -16,6 +16,9 @@ public partial class Launch
     [Inject]
     public OAuthStateStoreService OAuthStateStoreService { get; init; }
 
+    string IssMessage = string.Empty;
+    string LaunchMessage = string.Empty;
+
     protected override async System.Threading.Tasks.Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -23,6 +26,10 @@ public partial class Launch
             KeepLaunchIss();
             var bar = await GetMetadataAsync();
             var authUrl = await GetAuthorizeUrlAsync();
+
+            StateHasChanged();
+
+            await System.Threading.Tasks.Task.Delay(4000);
 
             NavigationManager.NavigateTo(authUrl);
         }
@@ -39,6 +46,8 @@ public partial class Launch
         SmartAppSettingService.Data.Iss = Iss;
         SmartAppSettingService.Data.Launch = LaunchCode;
         SmartAppSettingService.Data.FhirServerUrl = Iss;
+        IssMessage = $"ISS: {Iss}";
+        LaunchMessage = $"Launch Code: {LaunchCode}";
     }
 
     public async Task<bool> GetMetadataAsync()

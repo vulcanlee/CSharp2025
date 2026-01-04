@@ -17,6 +17,8 @@ public partial class Launch
     [Inject]
     public OAuthStateStoreService OAuthStateStoreService { get; init; }
 
+    string authUrlMessage = string.Empty;
+
     protected override async System.Threading.Tasks.Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -24,6 +26,11 @@ public partial class Launch
             KeepLaunchIss();
             var bar = await GetMetadataAsync();
             var authUrl = await GetAuthorizeUrlAsync();
+            authUrlMessage = $"重新導向到授權伺服器:{authUrl}";
+
+            StateHasChanged();
+
+            await System.Threading.Tasks.Task.Delay(4000);
 
             NavigationManager.NavigateTo(authUrl);
         }
@@ -96,7 +103,7 @@ public partial class Launch
         var state = Guid.NewGuid().ToString("N");
         SmartAppSettingService.Data.State = state;
 
-         await OAuthStateStoreService.SaveAsync<SmartAppSettingModel>(state, SmartAppSettingService.Data, TimeSpan.FromMinutes(10));
+        await OAuthStateStoreService.SaveAsync<SmartAppSettingModel>(state, SmartAppSettingService.Data, TimeSpan.FromMinutes(10));
 
         Console.WriteLine($"Generated state: {SmartAppSettingService.Data.State}");
         string launchUrl = $"{SmartAppSettingService.Data.AuthorizeUrl}?response_type=code" +

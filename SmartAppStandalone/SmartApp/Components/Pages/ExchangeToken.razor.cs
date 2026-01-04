@@ -204,7 +204,7 @@ public partial class ExchangeToken
 
         FhirClientSettings settings = new FhirClientSettings
         {
-            PreferredFormat = ResourceFormat.Json
+            PreferredFormat = ResourceFormat.Json,
         };
 
         FhirClient fhirClient = new FhirClient(
@@ -212,13 +212,19 @@ public partial class ExchangeToken
             httpClient,
             settings);
 
+
         // 1. 先找出該病患最近一年內的 Encounter
         // date=ge{一年前}&date=le{今天}，再加 patient=xxx
         SearchParams encounterSearch = new SearchParams()
             .Where($"patient={smartResponse.PatientId}")
-            .Where($"date=ge{oneYearAgo:O}")
-            .Where($"date=le{today:O}")
+            //.Where($"date=ge{oneYearAgo:O}")
+            //.Where($"date=le{today:O}")
             .LimitTo(100);
+
+        var list = encounterSearch.ToUriParamList();
+        var query = string.Join("&", list.Select(p => $"{p.Item1}={p.Item2}"));
+        string fullUrl = $"{SmartAppSettingService.Data.FhirServerUrl}/Encounter?{query}";
+        System.Console.WriteLine($"FHIR Search URL: {fullUrl}");
 
         Bundle encounterBundle = await fhirClient.SearchAsync<Encounter>(encounterSearch);
 

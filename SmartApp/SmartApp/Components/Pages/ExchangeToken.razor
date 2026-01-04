@@ -6,6 +6,19 @@
 @if (isReadPatient == false)
 {
     <h3>請稍後，讀取病患資料</h3>
+    <div>Code:@Code</div>
+    <div>State:@State</div>
+
+    @if (string.IsNullOrEmpty(AuthorizationCodeJson))
+    {
+        <pre>(no payload)</pre>
+    }
+    else
+    {
+        <div>Authorization Code 的實際內容</div>
+        <!-- 使用 <pre> 讓空白與換行都顯示出來 -->
+        <pre>@AuthorizationCodeJson</pre>
+    }
 }
 else
 {

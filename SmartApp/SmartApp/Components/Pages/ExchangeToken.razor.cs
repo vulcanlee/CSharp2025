@@ -1,6 +1,7 @@
 ﻿using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
 using Microsoft.AspNetCore.Components;
+using SmartApp.Helpers;
 using SmartApp.Models;
 using SmartApp.Servicers;
 using System.Net.Http.Headers;
@@ -15,11 +16,17 @@ public partial class ExchangeToken
     [Inject]
     public OAuthStateStoreService OAuthStateStoreService { get; init; }
 
+    public string AuthorizationCodeJson { get; private set; } = string.Empty;
+
     protected override async System.Threading.Tasks.Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await SetAuthCodeAsync();
+
+            StateHasChanged();
+            await System.Threading.Tasks.Task.Delay(5000);
+
             SmartResponse smartResponse = await GetAccessTokenAsync();
             await GetPatientAsync(smartResponse);
             StateHasChanged();
@@ -36,6 +43,8 @@ public partial class ExchangeToken
 
         SmartAppSettingService.UpdateSetting(SmartAppSettingModelItem);
         Console.WriteLine($"Retrive state: {SmartAppSettingService.Data.State}");
+
+        AuthorizationCodeJson = JwtHelper.DecodePayload(SmartAppSettingModelItem.AuthCode);
     }
 
     public async System.Threading.Tasks.Task<SmartResponse> GetAccessTokenAsync()

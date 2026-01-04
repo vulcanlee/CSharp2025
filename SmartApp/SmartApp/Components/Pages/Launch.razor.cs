@@ -24,12 +24,13 @@ public partial class Launch
         if (firstRender)
         {
             KeepLaunchIss();
-            var bar = await GetMetadataAsync();
-            var authUrl = await GetAuthorizeUrlAsync();
 
             StateHasChanged();
 
-            await System.Threading.Tasks.Task.Delay(4000);
+            await System.Threading.Tasks.Task.Delay(3000);
+
+            var bar = await GetMetadataAsync();
+            var authUrl = await GetAuthorizeUrlAsync();
 
             NavigationManager.NavigateTo(authUrl);
         }

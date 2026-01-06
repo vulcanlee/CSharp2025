@@ -1,0 +1,16 @@
+﻿@page "/launch"
+<h3>請稍後，正在初始化中</h3>
+<div>
+    <div>@IssMessage</div>
+    <div>@LaunchMessage</div>
+    <div>@authUrlMessage</div>
+</div>
+
+@code {
+    // https://localhost:7108/launch
+    [SupplyParameterFromQuery(Name = "iss")]
+    public string? Iss { get; set; }
+    [SupplyParameterFromQuery(Name = "launch")]
+    public string? LaunchCode { get; set; }
+
+}

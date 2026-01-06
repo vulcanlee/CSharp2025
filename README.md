@@ -36,9 +36,10 @@
 |*GithubCopilot8|Github Copilot 8 : 剖析Web API的程式碼並給出建議||
 |*GithubCopilot9|Github Copilot 9 : 修改使用ActionFilter減少重複程式||
 |*GithubCopilot10|Github Copilot 10 : 自動產生Commit訊息||
+|*GithubCopilot11|Github Copilot 11 : 執行時期遇到錯誤的協助的協助||
 |SmartApp|Smart On FHIR 之沙盒測試 EHR Launch||
-||||
-||||
+|*|FHIR 01 如何註冊 Smart On FHIR的沙盒 Sandbox||
+|SmartEHRLaunch1|FHIR 02 建立 EHR Launch App||
 ||||
 ||||
 ||||

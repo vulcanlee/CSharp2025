@@ -46,6 +46,48 @@ internal class Program
         //await GetConditionByEncounterId("623673");
     }
 
+    // 依 patientId + encounterId 取得相關 Condition
+    static async Task ListConditionByPatientAndEncounter(FhirClient client, string patientId, string encounterId)
+    {
+        // 等價於：
+        // GET https://hapi.fhir.org/baseR4/Condition?patient=Patient/{patientId}&encounter=Encounter/{encounterId}
+        var searchParams = new SearchParams()
+            .Where($"patient=Patient/{patientId}")
+            .Where($"encounter=Encounter/{encounterId}")
+            .LimitTo(200);
+
+        var bundle = await client.SearchAsync<Condition>(searchParams);
+
+        while (bundle != null)
+        {
+            foreach (var entry in bundle.Entry)
+            {
+                if (entry.Resource is not Condition condition)
+                {
+                    continue;
+                }
+
+                var conditionId = condition.Id ?? "(no id)";
+                var codeFirstCoding = condition.Code?.Coding?.FirstOrDefault();
+                var code = codeFirstCoding?.Code;
+                var display = codeFirstCoding?.Display;
+                var recordedDate = condition.RecordedDate;
+
+                Console.WriteLine(
+                    $"   ConditionId={conditionId}, Code={code}, Display={display}, RecordedDate={recordedDate}");
+            }
+
+            if (bundle.NextLink != null)
+            {
+                bundle = await client.ContinueAsync(bundle);
+            }
+            else
+            {
+                bundle = null;
+            }
+        }
+    }
+
     // 參考 CollectPatientWithEncounter：
     // 來源改成 Condition，從 Condition.subject 反推 Patient，
     // 統計每個 Patient 擁有幾筆 Condition，最後印出前 10 名。

@@ -15,6 +15,7 @@
 |csBlazorRoutingParameter|Blazor 跳轉 1 : 動態路由參數，傳遞與接收路由參數||
 |csBlazorQueryString|Blazor 跳轉 2 : 導航切換頁面時候，透過查詢字串，傳遞與接收查詢參數||
 |csPatientCRUD|病人資料 CRUD 操作範例||
+|csListEncounter|找出每個病人的就醫紀錄||
 |ReactWebApi|React API 01 : 前端使用 React，後端使用 ASP.NET Core 的測試標準專案||
 |reactGet|React API 02 : 呼叫一個 Get 方法 API，並將結果渲染到網頁上||
 |reactGetQueryString|React API 03 : 呼叫一個 Get 方法 API，取得查詢字串內容並將結果渲染到網頁上||
@@ -39,7 +40,8 @@
 |*GithubCopilot11|Github Copilot 11 : 執行時期遇到錯誤的協助的協助||
 |SmartApp|Smart On FHIR 之沙盒測試 EHR Launch||
 |*|FHIR 01 如何註冊 Smart On FHIR的沙盒 Sandbox||
-|SmartEHRLaunch1|FHIR 02 建立 EHR Launch App||
+|*SmartEHRLaunch1|FHIR 02 建立 EHR Launch App||
+|*SmartEHRLaunch2|FHIR 03 說明透過 EHR Launch 取得授權碼的程式碼做法與實測過程||
 ||||
 ||||
 ||||

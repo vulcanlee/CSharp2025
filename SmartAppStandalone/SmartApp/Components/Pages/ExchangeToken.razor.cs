@@ -243,7 +243,7 @@ public partial class ExchangeToken
         // 2. 過濾門診 / 急診 / 住院
         //    Encounter.class.code / type.coding[].code 的 mapping 會依各家實作不同，你要依實際情況調整。
         List<Encounter> filteredEncounters = encounters
-            .Where(e => IsOpdErIpdEncounter(e))
+            //.Where(e => IsOpdErIpdEncounter(e))
             .ToList();
 
         List<OrderItemResult> results = new List<OrderItemResult>();

@@ -1,4 +1,5 @@
-﻿using Fhir.Metrics;
+﻿using csListEncounter.Models;
+using Fhir.Metrics;
 using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
 using Hl7.Fhir.Utility;
@@ -7,20 +8,12 @@ using Task = System.Threading.Tasks.Task;
 
 namespace csListEncounter;
 
-public class PatientHasEncounterNode
-{
-    public string PatientId { get; set; }
-    public int Count { get; set; } = 0;
-}
-
-public class EncounterHasCoditionNode
-{
-    public string PatientId { get; set; }
-    public int Count { get; set; } = 0;
-}
-
 internal class Program
 {
+    static PatientConditions patientConditions = new PatientConditions();
+    static PatientEncounters patientEncounters = new PatientEncounters();
+    static ConditionSample conditionSample = new ConditionSample();
+
     private const string FhirBaseUrl = "https://hapi.fhir.org/baseR4";
     //private const string FhirBaseUrl = "https://server.fire.ly";
     const int maxPatients = 1000;
@@ -29,6 +22,7 @@ internal class Program
     static async Task Main(string[] args)
     {
         // GET https://hapi.fhir.org/baseR4/Condition?patient=Patient/623673&encounter=Encounter/623679
+        // GET https://hapi.fhir.org/baseR4/Condition?subject:missing=false&encounter:missing=false
 
         //var conditionPatients = await CollectPatientWithCondition();
         //Console.WriteLine($"-----------------------------------------");
@@ -36,16 +30,143 @@ internal class Program
 
         var client = new FhirClient(FhirBaseUrl);
         var patientId = "";
+        var encounterId = "";
         patientId = "623673";
         patientId = "622898";
         patientId = "623673";
-        //patientId = "ae61f37c-14ed-47dd-ad89-efb57c106227";
-        await ListEncounter(client, patientId);
-        Console.WriteLine($"-----------------------------------------");
+        patientId = "47969400";
+        patientId = "1398961";
+
+        encounterId = "1398964";
+        //await ListEncounter(client, patientId);
+        //await ListCondition(client, patientId);
+        await ListConditionByPatientAndEncounter(client, patientId, encounterId);
+
+        //encounterId = "47969439";
+        //Console.WriteLine($"-----------------------------------------");
+
         //await ListCondition(client, patientId);
         //await GetConditionByEncounterId("623673");
+
+        //await ListConditionHasPatientAndEncounterReference(client);
     }
 
+    static async Task ListConditionHasPatientAndEncounterReference(FhirClient client)
+    {
+        // 對應：
+        // GET https://hapi.fhir.org/baseR4/Condition?subject:missing=false&encounter:missing=false
+        var searchParams = new SearchParams()
+            .Where("subject:missing=false")
+            .Where("encounter:missing=false")
+            .LimitTo(200);
+
+        var bundle = await client.SearchAsync<Condition>(searchParams);
+
+        int cc = 0;
+        while (bundle != null)
+        {
+            foreach (var entry in bundle.Entry)
+            {
+                if (entry.Resource is not Condition condition)
+                {
+                    continue;
+                }
+
+                var conditionId = condition.Id ?? "(no id)";
+
+                // Patient Reference: Condition.subject (e.g. "Patient/623673")
+                var patientRef = condition.Subject?.Reference ?? string.Empty;
+                // Encounter Reference: Condition.encounter (e.g. "Encounter/623679")
+                var encounterRef = condition.Encounter?.Reference ?? string.Empty;
+
+                // 解析出純 Id
+                string? patientId = null;
+                string? encounterId = null;
+
+                const string patientPrefix = "Patient/";
+                const string encounterPrefix = "Encounter/";
+
+                if (!string.IsNullOrWhiteSpace(patientRef) &&
+                    patientRef.StartsWith(patientPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    patientId = patientRef.Substring(patientPrefix.Length);
+                }
+
+                if (!string.IsNullOrWhiteSpace(encounterRef) &&
+                    encounterRef.StartsWith(encounterPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    encounterId = encounterRef.Substring(encounterPrefix.Length);
+                }
+
+                var codeFirstCoding = condition.Code?.Coding?.FirstOrDefault();
+                var code = codeFirstCoding?.Code;
+                var display = codeFirstCoding?.Display;
+                var recordedDate = condition.RecordedDate;
+
+                if(string.IsNullOrWhiteSpace(patientId) || string.IsNullOrWhiteSpace(encounterId))
+                {
+                    continue; // 無法解析出 PatientId 或 EncounterId 就跳過
+                }
+                // 存到你的 sample model
+                var item = new ConditionNodeSample
+                {
+                    ConditionId = conditionId,
+                    PatientId = patientId,
+                    EncounterId = encounterId,
+                    Code = code,
+                    Display = display,
+                    RecordedDate = recordedDate?.ToString()
+                };
+                conditionSample.ConditionNodes.Add(item);
+
+                //Console.WriteLine(
+                //    $"PatientId={patientId}, ConditionId={conditionId}, EncounterId={encounterId}, " +
+                //    $"Code={code}, Display={display}, RecordedDate={recordedDate}");
+
+                cc++;
+                if (cc % 100 == 0)
+                {
+                    Console.WriteLine($"Processed {cc} Condition resources...");
+                }
+                if (cc > 3000)
+                {
+                    break;
+                }
+            }
+
+            if (cc > 3000)
+            {
+                break;
+            }
+            if (bundle.NextLink != null)
+            {
+                bundle = await client.ContinueAsync(bundle);
+            }
+            else
+            {
+                bundle = null;
+            }
+        }
+
+        var all = conditionSample.ConditionNodes
+            .GroupBy(x => x.PatientId)
+            .OrderByDescending(g => g.Count())
+            .ThenBy(g => g.Key)
+            .SelectMany(g => g
+                .OrderBy(x => x.EncounterId)
+                .ThenBy(x => x.ConditionId));
+        // 做出排序，最多的 PatientId 在前面，接著按照 EncounterId 與 ConditionId 排序
+
+        foreach (var item in all)
+        {
+            //Console.WriteLine(
+            //    $"PatientId={patientId}, ConditionId={conditionId}, EncounterId={encounterId}, " +
+            //    $"Code={code}, Display={display}, RecordedDate={recordedDate}");
+            Console.WriteLine(
+                $"PatientId={item.PatientId}, ConditionId={item.ConditionId}, EncounterId={item.EncounterId}, " +
+                $"Code={item.Code}, Display={item.Display}, RecordedDate={item.RecordedDate}");
+        }
+    }
     // 依 patientId + encounterId 取得相關 Condition
     static async Task ListConditionByPatientAndEncounter(FhirClient client, string patientId, string encounterId)
     {
@@ -283,6 +404,14 @@ internal class Program
 
     static async Task ListCondition(FhirClient client, string patientId)
     {
+        PatientConditionNode item = new PatientConditionNode()
+        {
+            PatientId = patientId,
+            Items = new List<ConditionNode>()
+        };
+
+        patientConditions.Items.Add(item);
+
         // Search: Condition?subject=Patient/{id}&_count=200
         var searchParams = new SearchParams()
             .Where($"subject=Patient/{patientId}")
@@ -318,7 +447,7 @@ internal class Program
                 };
 
                 // Condition.RecordedDate 是 Hl7.Fhir.Model.Date
-                var recordedDate = condition.RecordedDate; // 例如 "2020-01-01"
+                var recordedDate = condition.RecordedDate; // 例如 "2020-01-01"item
 
                 //Console.WriteLine(
                 //    $"   ConditionId={conditionId}, CodeText={codeText}, " +
@@ -343,6 +472,13 @@ internal class Program
     // 依 patientId 列出所有 Encounter：類別 + EncounterId + 時間
     static async Task ListEncounter(FhirClient client, string patientId)
     {
+        PatientEncounterNode item = new()
+        {
+            PatientId = patientId,
+            Items = new List<EncounterNode>()
+        };
+        patientEncounters.Items.Add(item);
+
         // Search: Encounter?patient={id}&_count=200
         var searchParams = new SearchParams()
             .Where($"patient={patientId}")
@@ -373,6 +509,15 @@ internal class Program
                 var start = encounter.Period?.Start;
                 var end = encounter.Period?.End;
 
+                item.Items.Add(new EncounterNode()
+                {
+                    Id = encounterId,
+                    Code = classCode,
+                    CodeText = typeText,
+                    Start = start,
+                    End = end
+                });
+
                 Console.WriteLine(
                     $"   EncounterId={encounterId}, 類別={typeText}({classCode}), 開始={start}, 結束={end}");
             }
@@ -388,10 +533,8 @@ internal class Program
         }
     }
 
-    static async Task GetConditionByEncounterId(string encounterId)
+    static async Task GetConditionByEncounterId(FhirClient client, string encounterId)
     {
-
-        var client = new FhirClient(FhirBaseUrl);
         var searchParams = new SearchParams()
             .Where($"encounter={encounterId}")
             .LimitTo(100); // 每頁最多 100 筆 Condition

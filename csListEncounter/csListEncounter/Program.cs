@@ -23,6 +23,7 @@ internal class Program
     {
         // GET https://hapi.fhir.org/baseR4/Condition?patient=Patient/623673&encounter=Encounter/623679
         // GET https://hapi.fhir.org/baseR4/Condition?subject:missing=false&encounter:missing=false
+        // GET https://hapi.fhir.org/baseR4/Encounter?patient=Patient/{patientId}&_include=Encounter:patient&_revinclude=Condition:encounter
 
         //var conditionPatients = await CollectPatientWithCondition();
         //Console.WriteLine($"-----------------------------------------");
@@ -40,7 +41,8 @@ internal class Program
         encounterId = "1398964";
         //await ListEncounter(client, patientId);
         //await ListCondition(client, patientId);
-        await ListConditionByPatientAndEncounter(client, patientId, encounterId);
+        await ListEncounterAndConditionByPatientId(client, patientId);
+        //await ListConditionByPatientAndEncounter(client, patientId, encounterId);
 
         //encounterId = "47969439";
         //Console.WriteLine($"-----------------------------------------");
@@ -51,6 +53,140 @@ internal class Program
         //await ListConditionHasPatientAndEncounterReference(client);
     }
 
+    static async Task ListEncounterAndConditionByPatientId(FhirClient client, string patientId)
+    {
+        // 第一步：查詢此病人的所有 Encounter
+        var encounterSearch = new SearchParams()
+            .Where($"patient=Patient/{patientId}")
+            .LimitTo(200);
+
+        var encounterBundle = await client.SearchAsync<Encounter>(encounterSearch);
+
+        conditionSample.ConditionNodes.Clear();
+
+        // 暫存 Encounter 資訊：Code / Text / Start
+        var encounterMap = new Dictionary<string, (string? Code, string? CodeText, string? Start)>();
+
+        while (encounterBundle != null)
+        {
+            foreach (var entry in encounterBundle.Entry)
+            {
+                Console.Write("*");
+
+                if (entry.Resource is not Encounter encounter)
+                {
+                    continue;
+                }
+
+                var encounterId = encounter.Id;
+                if (string.IsNullOrWhiteSpace(encounterId))
+                {
+                    continue;
+                }
+
+                var classCode = encounter.Class?.Code;
+                var classText = encounter.Class?.Display;
+                var start = encounter.Period?.Start;
+
+                encounterMap[encounterId] = (classCode, classText, start);
+            }
+
+            if (encounterBundle.NextLink != null)
+            {
+                encounterBundle = await client.ContinueAsync(encounterBundle);
+            }
+            else
+            {
+                encounterBundle = null;
+            }
+        }
+
+        // 第二步：對每個 Encounter 查 Condition?encounter=Encounter/{id}
+        foreach (var kvp in encounterMap)
+        {
+                    Console.Write("%");
+            var encounterId = kvp.Key;
+            var (encCode, encCodeText, encStart) = kvp.Value;
+
+            var conditionSearch = new SearchParams()
+                .Where($"encounter=Encounter/{encounterId}")
+                .LimitTo(200);
+
+            var conditionBundle = await client.SearchAsync<Condition>(conditionSearch);
+
+            while (conditionBundle != null)
+            {
+                foreach (var entry in conditionBundle.Entry)
+                {
+                    Console.Write("=");
+                    if (entry.Resource is not Condition condition)
+                    {
+                        continue;
+                    }
+
+                    var conditionId = condition.Id ?? "(no id)";
+
+                    // 解析 PatientId（Condition.subject）
+                    var patientRef = condition.Subject?.Reference;
+                    string? parsedPatientId = null;
+                    const string patientPrefix = "Patient/";
+                    if (!string.IsNullOrWhiteSpace(patientRef) &&
+                        patientRef.StartsWith(patientPrefix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        parsedPatientId = patientRef.Substring(patientPrefix.Length);
+                    }
+
+                    // 保險起見，只收這個病人的資料
+                    if (parsedPatientId != patientId)
+                    {
+                        continue;
+                    }
+
+                    var codeFirstCoding = condition.Code?.Coding?.FirstOrDefault();
+                    var code = codeFirstCoding?.Code;
+                    var display = codeFirstCoding?.Display;
+                    var recordedDate = condition.RecordedDate;
+
+                    var item = new ConditionNodeSample
+                    {
+                        PatientId = parsedPatientId,
+                        EncounterId = encounterId,
+                        EncounterCode = encCode,
+                        EncounterCodeText = encCodeText,
+                        EncounterStart = encStart,
+                        ConditionId = conditionId,
+                        ConditionCode = code,
+                        Display = display,
+                        RecordedDate = recordedDate?.ToString()
+                    };
+
+                    conditionSample.ConditionNodes.Add(item);
+                }
+
+                if (conditionBundle.NextLink != null)
+                {
+                    conditionBundle = await client.ContinueAsync(conditionBundle);
+                }
+                else
+                {
+                    conditionBundle = null;
+                }
+            }
+        }
+
+        // 若需要輸出檢查
+        foreach (var item in conditionSample.ConditionNodes
+                     .OrderBy(x => x.EncounterId)
+                     .ThenBy(x => x.ConditionId))
+        {
+            Console.WriteLine(
+                $"PatientId={item.PatientId}, " +
+                $"EncounterId={item.EncounterId}, " +
+                $"EncounterCode={item.EncounterCode}, EncounterCodeText={item.EncounterCodeText}, EncounterStart={item.EncounterStart}, " +
+                $"ConditionId={item.ConditionId}, " +
+                $"ConditionCode={item.ConditionCode}, Display={item.Display}, RecordedDate={item.RecordedDate}");
+        }
+    }
     static async Task ListConditionHasPatientAndEncounterReference(FhirClient client)
     {
         // 對應：
@@ -113,7 +249,7 @@ internal class Program
                     ConditionId = conditionId,
                     PatientId = patientId,
                     EncounterId = encounterId,
-                    Code = code,
+                    ConditionCode = code,
                     Display = display,
                     RecordedDate = recordedDate?.ToString()
                 };
@@ -164,7 +300,7 @@ internal class Program
             //    $"Code={code}, Display={display}, RecordedDate={recordedDate}");
             Console.WriteLine(
                 $"PatientId={item.PatientId}, ConditionId={item.ConditionId}, EncounterId={item.EncounterId}, " +
-                $"Code={item.Code}, Display={item.Display}, RecordedDate={item.RecordedDate}");
+                $"Code={item.ConditionCode}, Display={item.Display}, RecordedDate={item.RecordedDate}");
         }
     }
     // 依 patientId + encounterId 取得相關 Condition

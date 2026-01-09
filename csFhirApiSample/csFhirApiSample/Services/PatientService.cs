@@ -30,9 +30,10 @@ public class PatientService
         patientModel.Id = patient.Id;
         patientModel.Name = patient.Name[0].ToString();
         patientModel.Gender = patient.Gender?.ToString().ToLowerInvariant();
-        // 取出 Patient.Identifier 裡的第一個 identifier 當身分證號
+        // 取出 Patient.Identifier 裡 system = "urn:oid:2.16.840.1.113883.4.3.25" 的 identifier 當身分證號
+        const string nationalIdSystem = "urn:oid:2.16.840.1.113883.4.3.25";
         var nationalId = patient.Identifier?
-            .FirstOrDefault()?
+            .FirstOrDefault(id => id.System == nationalIdSystem)?
             .Value;
         patientModel.NationalId = nationalId;
         // 依照實作的血型 extension URL 調整這一行

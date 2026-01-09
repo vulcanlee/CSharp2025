@@ -12,9 +12,12 @@ namespace csFhirApiSample
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+            builder.Services.AddSwaggerGen();
 
             builder.Services.AddScoped<Services.PatientService>();
             builder.Services.AddScoped<Services.ObservationHeightWeightService>();
+            builder.Services.AddScoped<Services.EncounterService>();
+            builder.Services.AddScoped<Services.ConditionService>();
 
             var app = builder.Build();
 
@@ -23,6 +26,8 @@ namespace csFhirApiSample
             {
                 app.MapOpenApi();
             }
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 

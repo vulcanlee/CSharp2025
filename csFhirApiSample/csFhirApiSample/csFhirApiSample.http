@@ -9,3 +9,16 @@ Accept: application/json
 GET {{csFhirApiSample_HostAddress}}/patient?patientId={{patientId}}
 
 ###
+
+GET {{csFhirApiSample_HostAddress}}/encounter?patientId={{patientId}}
+
+###
+
+@encounterId=1398964
+GET {{csFhirApiSample_HostAddress}}/condition?encounterId={{encounterId}}
+
+###
+
+GET {{csFhirApiSample_HostAddress}}/condition/patient/{{patientId}}
+
+###

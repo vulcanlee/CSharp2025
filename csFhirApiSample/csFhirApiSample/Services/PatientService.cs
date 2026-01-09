@@ -29,6 +29,20 @@ public class PatientService
         PatientModel patientModel = new PatientModel();
         patientModel.Id = patient.Id;
         patientModel.Name = patient.Name[0].ToString();
+        patientModel.Gender = patient.Gender?.ToString().ToLowerInvariant();
+        // 取出 Patient.Identifier 裡的第一個 identifier 當身分證號
+        var nationalId = patient.Identifier?
+            .FirstOrDefault()?
+            .Value;
+        patientModel.NationalId = nationalId;
+        // 依照實作的血型 extension URL 調整這一行
+        const string bloodTypeExtensionUrl = "http://example.org/fhir/StructureDefinition/patient-blood-type";
+        // 從 Patient.extension 取出血型
+        var bloodTypeExt = patient.Extension?.FirstOrDefault(e => e.Url == bloodTypeExtensionUrl);
+        var bloodTypeCode = (bloodTypeExt?.Value as CodeableConcept)?.Coding?.FirstOrDefault()?.Code;
+        // 或者如果是 valueString，就改成：
+        // var bloodTypeCode = (bloodTypeExt?.Value as FhirString)?.Value;
+                patientModel.BloodType = bloodTypeCode; 
         patientModel.BirthDate = patient.BirthDate;
         return patientModel;
 

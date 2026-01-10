@@ -29,7 +29,16 @@ internal class Program
         //Console.WriteLine($"-----------------------------------------");
         //var encounterPatients = await CollectPatientWithEncounter();
 
-        var client = new FhirClient(FhirBaseUrl);
+        // 建立帶有 logging 功能的 FhirClient
+        var loggingHandler = new LoggingHandler(new HttpClientHandler());
+        
+        var settings = new FhirClientSettings
+        {
+            PreferredFormat = ResourceFormat.Json
+        };
+        
+        var client = new FhirClient(new Uri(FhirBaseUrl), settings, loggingHandler);
+
         var patientId = "";
         var encounterId = "";
         patientId = "623673";
@@ -39,9 +48,9 @@ internal class Program
         patientId = "1398961";
 
         encounterId = "1398964";
-        //await ListEncounter(client, patientId);
+        await ListEncounter(client, patientId);
         //await ListCondition(client, patientId);
-        await ListEncounterAndConditionByPatientId(client, patientId);
+        //await ListEncounterAndConditionByPatientId(client, patientId);
         //await ListConditionByPatientAndEncounter(client, patientId, encounterId);
 
         //encounterId = "47969439";

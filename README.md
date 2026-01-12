@@ -42,9 +42,9 @@
 |SmartApp|Smart On FHIR 之沙盒測試 EHR Launch||
 |*|FHIR 01 如何註冊 Smart On FHIR的沙盒 Sandbox||
 |*SmartEHRLaunch1|FHIR 02 建立 EHR Launch App||
-|*SmartEHRLaunch2|FHIR 03 說明透過 EHR Launch 取得授權碼的程式碼做法與實測過程||
-||||
-||||
+|*SmartEHRLaunch1|FHIR 03 說明透過 EHR Launch 取得授權碼的程式碼做法與實測過程||
+|*SmartEHRLaunch1|FHIR 04 在 EHR Launchc 建立新頁面來接收授權碼進而取得存取權杖並呼叫 FHIR API||
+|*SmartEHRLaunch1|FHIR 05 說明 EHR Launchc 建立 ExchangeToken 新頁面的程式碼做法與實測過程||
 ||||
 ||||
 ||||

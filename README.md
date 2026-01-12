@@ -14,7 +14,6 @@
 |csBlazorAntDesignQuickStart|使用 Ant Design Blazor 組件快速建立頁面||
 |csBlazorRoutingParameter|Blazor 跳轉 1 : 動態路由參數，傳遞與接收路由參數||
 |csBlazorQueryString|Blazor 跳轉 2 : 導航切換頁面時候，透過查詢字串，傳遞與接收查詢參數||
-|csPatientCRUD|病人資料 CRUD 操作範例||
 |csListEncounter|找出每個病人的就醫紀錄||
 |csFhirApiSample|取得 FHIR 資源||
 |ReactWebApi|React API 01 : 前端使用 React，後端使用 ASP.NET Core 的測試標準專案||
@@ -45,7 +44,11 @@
 |*SmartEHRLaunch1|FHIR 03 說明透過 EHR Launch 取得授權碼的程式碼做法與實測過程||
 |*SmartEHRLaunch1|FHIR 04 在 EHR Launchc 建立新頁面來接收授權碼進而取得存取權杖並呼叫 FHIR API||
 |*SmartEHRLaunch1|FHIR 05 說明 EHR Launchc 建立 ExchangeToken 新頁面的程式碼做法與實測過程||
-||||
+|SmartEHRLaunch1|FHIR 06 建立 Standalone Launch App||
+|SmartEHRLaunch1|FHIR 07 說明透過 Standalone 取得授權碼的程式碼做法與實測過程||
+|SmartEHRLaunch1|FHIR 08 在 Standalone 建立新頁面來接收授權碼進而取得存取權杖並呼叫 FHIR API||
+|SmartEHRLaunch1|FHIR 09 說明 Standalone 建立 ExchangeToken 新頁面的程式碼做法與實測過程||
+|csPatientCRUD|FHIR 10 病人資料 CRUD 操作範例||
 ||||
 ||||
 ||||

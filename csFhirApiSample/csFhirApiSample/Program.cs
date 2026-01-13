@@ -19,6 +19,16 @@ namespace csFhirApiSample
             builder.Services.AddScoped<Services.EncounterService>();
             builder.Services.AddScoped<Services.ConditionService>();
 
+			// Configure CORS to allow any origin/method/header (suitable for dev/demo)
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("AllowAll",
+					policy => policy
+						.AllowAnyOrigin()
+						.AllowAnyMethod()
+						.AllowAnyHeader());
+			});
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -26,6 +36,7 @@ namespace csFhirApiSample
             {
                 app.MapOpenApi();
             }
+			app.UseCors("AllowAll");
             app.UseSwagger();
             app.UseSwaggerUI();
 

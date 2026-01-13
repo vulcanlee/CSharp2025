@@ -1,4 +1,4 @@
-
+﻿
 namespace csFhirApiSample
 {
     public class Program
@@ -36,12 +36,14 @@ namespace csFhirApiSample
             {
                 app.MapOpenApi();
             }
-			app.UseCors("AllowAll");
             app.UseSwagger();
             app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 
+            // ✅ CORS 應該放在這裡 - 在 UseRouting 之後、UseAuthorization 之前
+            app.UseCors("AllowAll");
+            
             app.UseAuthorization();
 
 

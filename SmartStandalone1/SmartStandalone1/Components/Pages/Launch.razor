@@ -1,0 +1,13 @@
+﻿@page "/launch"
+@inject NavigationManager NavigationManager
+<h3>請稍後，正在初始化中</h3>
+
+<div>@authUrlMessage</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "iss")]
+    public string? Iss { get; set; }
+    [SupplyParameterFromQuery(Name = "launch")]
+    public string? LaunchCode { get; set; }
+
+}

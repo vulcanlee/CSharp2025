@@ -1,0 +1,33 @@
+﻿@page "/ExchangeToken"
+@using Hl7.Fhir.Model
+@inject NavigationManager NavigationManager
+
+@if (isReadPatient == false)
+{
+    <h3>請稍後，讀取病患資料</h3>
+}
+else
+{
+    <div>
+        <p>Id</p>
+        <p>@patient.Id</p>
+        <p>病患名稱</p>
+        <p>@patient.Name[0].ToString()</p>
+        <p>出生日</p>
+        <p>@patient.BirthDate.ToString()</p>
+        <p>身高</p>
+        <p>@heightAndWeight.HeightValue <span> @heightAndWeight.HeightUnit</span></p>
+        <p>體重</p>
+        <p>@heightAndWeight.WeightValue <span> @heightAndWeight.WeightUnit</span></p>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "code")]
+    public string? Code { get; set; }
+    [SupplyParameterFromQuery(Name = "state")]
+    public string? State { get; set; }
+
+    bool isReadPatient = false;
+    Patient patient = new();
+}

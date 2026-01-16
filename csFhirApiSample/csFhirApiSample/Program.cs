@@ -41,6 +41,9 @@ namespace csFhirApiSample
 
             app.UseHttpsRedirection();
 
+            // 2) 啟用 wwwroot 靜態檔案
+            app.UseStaticFiles();
+
             // ✅ CORS 應該放在這裡 - 在 UseRouting 之後、UseAuthorization 之前
             app.UseCors("AllowAll");
             

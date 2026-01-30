@@ -54,14 +54,14 @@ public class ObservationHeightWeightService
                 continue;
             }
 
-            Quantity? quantity = obs.Value as Quantity;
-            if (quantity is null)
-            {
-                continue;
-            }
-
             if (loincCode == "8302-2")
             {
+                Quantity? quantity = obs.Value as Quantity;
+                if (quantity is null)
+                {
+                    continue;
+                }
+
                 // 身高
                 if (quantity.Value.HasValue)
                 {
@@ -71,12 +71,39 @@ public class ObservationHeightWeightService
             }
             else if (loincCode == "29463-7")
             {
+                Quantity? quantity = obs.Value as Quantity;
+                if (quantity is null)
+                {
+                    continue;
+                }
+
                 // 體重
                 if (quantity.Value.HasValue)
                 {
                     result.WeightValue = quantity.Value.ToString();
                     result.WeightUnit = quantity.Unit ?? quantity.Code;
                 }
+            }// 3. 血型：假設血型 Observation 的 code 是 882-1，且 value 是 CodeableConcept
+            else if (loincCode == "882-1") // TODO: 這個 code 要換成你們實際使用的 LOINC / Code
+            {
+                // valueCodeableConcept
+                CodeableConcept? cc = obs.Value as CodeableConcept;
+                if (cc is not null)
+                {
+                    // 例如 Coding[0].Code 可能是 "A", "B", "AB", "O"
+                    string? bloodTypeCode = cc.Coding?.FirstOrDefault()?.Code;
+                    if (!string.IsNullOrEmpty(bloodTypeCode))
+                    {
+                        result.BloodType = bloodTypeCode;
+                    }
+                }
+
+                // 如果伺服器用 valueString，則改用：
+                // FhirString? bloodTypeString = obs.Value as FhirString;
+                // if (bloodTypeString is not null)
+                // {
+                //     result.BloodType = bloodTypeString.Value;
+                // }
             }
         }
 

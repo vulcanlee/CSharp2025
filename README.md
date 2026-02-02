@@ -44,13 +44,13 @@
 |*SmartEHRLaunch1|FHIR 03 說明透過 EHR Launch 取得授權碼的程式碼做法與實測過程||
 |*SmartEHRLaunch1|FHIR 04 在 EHR Launchc 建立新頁面來接收授權碼進而取得存取權杖並呼叫 FHIR API||
 |*SmartEHRLaunch1|FHIR 05 說明 EHR Launchc 建立 ExchangeToken 新頁面的程式碼做法與實測過程||
-|SmartEHRLaunch1|FHIR 06 建立 Standalone Launch App||
-|SmartEHRLaunch1|FHIR 07 說明透過 Standalone 取得授權碼的程式碼做法與實測過程||
-|SmartEHRLaunch1|FHIR 08 在 Standalone 建立新頁面來接收授權碼進而取得存取權杖並呼叫 FHIR API||
-|SmartEHRLaunch1|FHIR 09 說明 Standalone 建立 ExchangeToken 新頁面的程式碼做法與實測過程||
+|*SmartEHRLaunch1|FHIR 06 建立 Standalone Launch App||
+|*SmartEHRLaunch1|FHIR 07 說明透過 Standalone 取得授權碼的程式碼做法與實測過程||
+|*SmartEHRLaunch1|FHIR 08 在 Standalone 建立新頁面來接收授權碼進而取得存取權杖並呼叫 FHIR API||
+|*SmartEHRLaunch1|FHIR 09 說明 Standalone 建立 ExchangeToken 新頁面的程式碼做法與實測過程||
 |csPatientCRUD|FHIR 10 使用 FHIR API 對病人資料 CRUD 操作範例||
 |csPatientCRUD|FHIR 11 如何對FhirClient的API呼叫，看到實際的 HTTP Payload||
-||||
+|csObservation|對於 FHIR Observation 的操作範例 ||
 ||||
 ||||
 ||||

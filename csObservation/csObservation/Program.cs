@@ -8,8 +8,8 @@ internal class Program
     static void Main(string[] args)
     {
         // ======== 你需要改的設定 ========
-        var fhirBaseUrl = "https://hapi.fhir.tw/fhir";  // 例如 HAPI FHIR: http://10.1.1.113:8080/fhir
-        var patientId = "1084";                        // 指定 Patient/{id}
+        var fhirBaseUrl = "http://10.1.1.113:8080/fhir"; 
+        var patientId = "01707a0c-9619-ccba-695a-b270744d76c2";                        // 指定 Patient/{id}
         var startDate = new DateTimeOffset(2014, 01, 01, 0, 0, 0, TimeSpan.FromHours(8));
         var endDate = new DateTimeOffset(2024, 12, 31, 23, 59, 59, TimeSpan.FromHours(8));
 

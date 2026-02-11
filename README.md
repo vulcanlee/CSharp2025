@@ -50,10 +50,10 @@
 |*SmartEHRLaunch1|FHIR 09 說明 Standalone 建立 ExchangeToken 新頁面的程式碼做法與實測過程||
 |*csPatientCRUD|FHIR 10 使用 FHIR API 對病人資料 CRUD 操作範例||
 |*csPatientCRUD|FHIR 11 如何對FhirClient的API呼叫，看到實際的 HTTP Payload||
-|csObservation|對於 FHIR Observation 的操作範例 ||
+|*csObservation|FHIR 13 對於 FHIR Observation 的操作範例 ||
 |*csOrganization|FHIR 12 建立三個醫院的Organization操作範例||
 |*csAsynchronousStream|比較同步與非同步串流的程式設計執行結果差異||
-||||
+|csDiagnosticReport|FHIR 14 對於 FHIR DiagnosticReport 的操作範例||
 ||||
 ||||
 ||||

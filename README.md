@@ -6,7 +6,7 @@
 |csAzureBlobStorage|如何使用與存取 Azure Blob Storage Service||
 |csSpeechToTextBatch|將語音檔案進行批次轉錄成為文字||
 |csSTTAllInOne|設機一個支援類別，整理上傳 .mp3 與 轉文字的功能||
-|csDicomToImage|將 DICOM 轉換成為一個 Image||
+|*csDicomToImage|將 DICOM 轉換成為一個 Image||
 |csDicomListAllTag|列出 DICOM 檔案中的所有標籤||
 |csDicomGetSetTagValue|取得或設定 DICOM 檔案中的標籤值||
 |csBlazor|使用Github Copilot 輔助開發網頁||
@@ -53,7 +53,7 @@
 |*csObservation|FHIR 13 對於 FHIR Observation 的操作範例 ||
 |*csOrganization|FHIR 12 建立三個醫院的Organization操作範例||
 |*csAsynchronousStream|比較同步與非同步串流的程式設計執行結果差異||
-|csDiagnosticReport|FHIR 14 對於 FHIR DiagnosticReport 的操作範例||
+|*csDiagnosticReport|FHIR 14 對於 FHIR DiagnosticReport 的操作範例||
 ||||
 ||||
 ||||

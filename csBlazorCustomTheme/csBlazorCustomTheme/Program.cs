@@ -1,5 +1,4 @@
 using csBlazorCustomTheme.Components;
-using Microsoft.AspNetCore.Components;
 
 namespace csBlazorCustomTheme
 {

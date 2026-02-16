@@ -1,0 +1,106 @@
+﻿:root {
+    --ant-primary-color: #3b7f1a;
+    --ant-primary-color-hover: #2b5814;
+    --ant-primary-color-active: #3b7f1a;
+    --ant-link-color: #1DA57A;
+    --ant-success-color: #3b7f1a;
+    --ant-warning-color: #9714fa;
+    --ant-error-color: #ff6a00;
+    --ant-font-size-base: 24px;
+    --ant-line-height-base: 1.8;
+    --ant-border-radius-base: 8px;
+    /* 標題字體大小 (基於 24px) */
+    --ant-font-size-h1: 48px; /* 2倍 */
+    --ant-font-size-h2: 38px; /* 1.6倍 */
+    --ant-font-size-h3: 31px; /* 1.3倍 */
+    /* 間距比例調整 (約 1.7 倍) */
+    --ant-padding-xs: 10px;
+    --ant-padding-sm: 12px;
+    --ant-padding-md: 20px;
+    --ant-padding-lg: 32px;
+}
+
+/* HTML 標題調整 */
+h1 {
+    font-size: var(--ant-font-size-h1);
+    line-height: 1.4;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: var(--ant-font-size-h2);
+    line-height: 1.4;
+}
+
+h3 {
+    font-size: var(--ant-font-size-h3);
+    line-height: 1.5;
+}
+
+/* 按鈕調整 */
+.ant-btn,
+.ant-btn-default,
+.ant-btn-primary,
+.ant-btn-dashed,
+.ant-btn-link,
+.ant-btn-text,
+.ant-btn-dangerous {
+    font-size: var(--ant-font-size-base);
+    padding: 8px 24px;
+    height: auto;
+    min-height: 48px;
+    line-height: var(--ant-line-height-base);
+}
+
+.ant-btn-primary {
+    background-color: var(--ant-primary-color);
+    border-color: var(--ant-primary-color);
+}
+
+.ant-btn-primary:hover {
+    background-color: var(--ant-primary-color-hover);
+    border-color: var(--ant-primary-color-hover);
+}
+
+/* Alert 元件調整 */
+.ant-alert {
+    font-size: var(--ant-font-size-base);
+    padding: 12px 20px;
+    line-height: var(--ant-line-height-base);
+}
+
+.ant-alert-message {
+    font-size: var(--ant-font-size-base);
+    line-height: var(--ant-line-height-base);
+}
+
+.ant-alert-icon {
+    font-size: 28px;  /* 圖示稍大於文字 */
+    line-height: 1.8;
+}
+
+.ant-alert-with-description {
+    padding: 16px 24px;
+}
+
+.ant-alert-description {
+    font-size: 20px;  /* 描述文字稍小 */
+}
+
+/* 表單控制項調整 */
+.ant-input,
+.ant-select-selector,
+.ant-picker {
+    font-size: var(--ant-font-size-base);
+    padding: 8px 16px;
+    line-height: var(--ant-line-height-base);
+}
+
+/* 通用文字元素 */
+body,
+p,
+span,
+div {
+    font-size: var(--ant-font-size-base);
+    line-height: var(--ant-line-height-base);
+}

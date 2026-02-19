@@ -10,3 +10,7 @@ Accept: application/json
 GET {{WebApiDemo_HostAddress}}/weatherforecast/GetWeatherByLocationAndDate?location={{location}}&date={{currentDateTime}}
 
 ###
+
+GET {{WebApiDemo_HostAddress}}/weatherforecast
+
+###

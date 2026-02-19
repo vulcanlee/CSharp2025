@@ -64,8 +64,8 @@ function App() {
                 throw new Error('未取得 forecast_data Cookie')
             }
 
-            const foo = decodeURIComponent(json)
-            const bar = JSON.parse(foo)
+            //const foo = decodeURIComponent(json)
+            //const bar = JSON.parse(foo)
             const data: WeatherForecast[] = JSON.parse(decodeURIComponent(json))
             setForecasts(data)
         } catch (err) {

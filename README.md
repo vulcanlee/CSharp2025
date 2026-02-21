@@ -56,6 +56,7 @@
 |*csAsynchronousStream|比較同步與非同步串流的程式設計執行結果差異||
 |*csDiagnosticReport|FHIR 14 對於 FHIR DiagnosticReport 的操作範例||
 |*csNlog55|在 ASP.NET Core 框架下，如何使用 NLog 5.5 進行日誌記錄||
+|*csNlog61|在 ASP.NET Core 框架下，如何使用 NLog 6.1 進行日誌記錄||
 ||||
 ||||
 ||||

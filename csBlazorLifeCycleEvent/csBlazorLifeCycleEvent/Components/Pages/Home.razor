@@ -1,0 +1,32 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<div class="p-3">
+    <button class="btn btn-primary" @onclick="OnButtonNothingClick">僅觸發按鈕事件</button>
+    <button class="btn btn-secondary" @onclick="OnButtonChange1ParameterClick">觸發按鈕事件並變更 1 個參數</button>
+    <button class="btn btn-success" @onclick="OnButtonChange2ParameterClick">觸發按鈕事件並變更 2 個參數</button>
+    <button class="btn btn-success" @onclick="OnButtonChangeObjectPropertyParameterClick">觸發按鈕事件並變更參數的物件屬性值</button>
+</div>
+
+<div class="p-3">
+    <div class="card">
+        <div class="card-body">
+            <p>This is the parent view.</p>
+            <p>Name : @Name</p>
+            <p>Age : @Age</p>
+            <p>Address Hash : @Address.GetHashCode()</p>
+            <p>Country : @Address.Country</p>
+            <p>City : @Address.City</p>
+        </div>
+    </div>
+</div>
+
+<div class="p-3">
+    <ChildView Name="@Name" Age="@Age" />
+    @* <ChildView Name="@Name" Age="@Age" Address="@Address" /> *@
+</div>

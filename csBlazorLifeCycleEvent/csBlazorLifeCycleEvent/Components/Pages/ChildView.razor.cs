@@ -9,7 +9,7 @@ public partial class ChildView
 
     [Parameter]
     public int Age { get; set; }
-    //[Parameter]
+    [Parameter]
     public Address Address { get; set; } = new();
     public override async Task SetParametersAsync(ParameterView parameters)
     {

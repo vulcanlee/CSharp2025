@@ -57,7 +57,9 @@
 |*csDiagnosticReport|FHIR 14 對於 FHIR DiagnosticReport 的操作範例||
 |*csNlog55|在 ASP.NET Core 框架下，如何使用 NLog 5.5 進行日誌記錄||
 |*csNlog61|在 ASP.NET Core 框架下，如何使用 NLog 6.1 進行日誌記錄||
-|csBlazorLifeCycleEvent|Blazor 元件生命週期事件深入探討||
+|*csBlazorLifeCycleEvent|Blazor 元件生命週期事件深入探討||
+|*csBlazorLifeCycleEvent|# Blazor 元件生命週期事件深入探討 2 - 使用基本型別與類別引數的差異
+||
 ||||
 ||||
 ||||
